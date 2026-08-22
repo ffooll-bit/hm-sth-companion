@@ -71,12 +71,13 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### ENH-004 — Local AI tooling artifacts not gitignored
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-22 20:15
 - **Implemented:** `—`
 - **Problem:** Local AI tooling directories such as `.cortexkit/` (Magic Context session data) keep showing up as untracked changes, keeping `git status` dirty and risking an accidental commit of internal tooling data to the public repository.
 - **Possible Fix:** Add tooling artifact entries (`.cortexkit/`, plus `.playwright-mcp/` for future web testing sessions) to `.gitignore`.
+- **Actual Fix:** Add an 'AI tooling' section to `.gitignore` with entries `.cortexkit/` and `.playwright-mcp/`. Verified against official gitignore semantics (git-scm.com): trailing-slash patterns match directories only, so both tooling roots are ignored entirely regardless of nested content — the plugin's own nested `.gitignore` does not prevent the untracked-directory report. No application code involved.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
