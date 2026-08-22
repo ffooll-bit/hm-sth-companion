@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HM STH Companion Social Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0b0e14;
+    --mantle: #12151e;
+    --surface: #191d2b;
+    --surface1: #242a3d;
+    --border: #242a3d;
+    --text: #e6e8ee;
+    --text-muted: #9aa1b5;
+    --accent: #58a55c;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  }
+  html, body { width: 1280px; height: 640px; overflow: hidden; }
+  body { font-family: var(--font); }
+
+  .frame {
+    width: 1280px;
+    height: 640px;
+    padding: 53px;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .brand { flex: 0 0 520px; }
+  .logo-row { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+  .logo {
+    width: 64px; height: 64px; flex-shrink: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--bg));
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  }
+  .logo-hm { font-size: 23px; font-weight: 800; letter-spacing: 1px; color: var(--text); line-height: 1; }
+  .logo-sth { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--accent); line-height: 1; }
+  .logo-cap {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    line-height: 1.08;
+  }
+  .subtitle {
+    margin-top: 8px;
+    font-size: 19px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .desc {
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text);
+    opacity: 0.92;
+    max-width: 500px;
+  }
+  .chips { margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    padding: 8px 16px;
+    border: 1px solid var(--surface1);
+    border-radius: 999px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.4px;
+  }
+
+  .visual {
+    flex: 1;
+    min-width: 0;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mock-window {
+    width: 100%; max-width: 560px;
+    border: 1px solid var(--surface1);
+    border-radius: 12px;
+    background: var(--mantle);
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  }
+  .mock-titlebar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--surface1); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dot.a { background: #ff5f57; } .dot.b { background: #febc2e; } .dot.c { background: #28c840; }
+  .mock-title { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; }
+  .mock-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .panel { padding: 16px; }
+  .panel.left { border-right: 1px solid var(--surface1); }
+  .panel.guide { grid-column: 1 / -1; border-top: 1px solid var(--surface1); }
+  .p-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; }
+  .stat { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+  .stat b { color: var(--text); min-width: 62px; font-weight: 600; }
+  .stat .val { color: var(--accent); }
+  .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--surface1); overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+
+  .footer {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.3px;
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="main">
+      <div class="brand">
+        <div class="logo-row">
+          <div class="logo" aria-hidden="true"><span class="logo-hm">HM</span><span class="logo-sth">StH</span></div>
+          <span class="logo-cap">HM STH COMPANION</span>
+        </div>
+        <h1>HM STH Companion</h1>
+        <div class="subtitle">Live game info &amp; full walkthrough</div>
+        <p class="desc">Windows companion tool for Harvest Moon: Save the Homeland on PCSX2 — live game memory info and a complete walkthrough guide.</p>
+        <div class="chips">
+          <span class="chip">PCSX2</span>
+          <span class="chip">Memory Reader</span>
+          <span class="chip">Walkthrough</span>
+        </div>
+      </div>
+
+      <div class="visual">
+        <div class="mock-window">
+          <div class="mock-titlebar">
+            <i class="dot a"></i><i class="dot b"></i><i class="dot c"></i>
+            <span class="mock-title">hm-sth-companion</span>
+          </div>
+          <div class="mock-grid">
+            <div class="panel left">
+              <div class="p-label">Game HUD</div>
+              <div class="stat"><b>Stamina</b><span class="bar"><i style="width: 78%;"></i></span></div>
+              <div class="stat"><b>Money</b><span class="bar"><i style="width: 45%;"></i></span></div>
+              <div class="stat"><b>Weather</b><span class="val">Sunny</span></div>
+            </div>
+            <div class="panel">
+              <div class="p-label">Memory Monitor</div>
+              <div class="stat"><b>0x021C3A4E</b><span class="val">87</span></div>
+              <div class="stat"><b>0x021C3A50</b><span class="val">420G</span></div>
+              <div class="stat"><b>FPS</b><span>59 &middot; 60Hz</span></div>
+            </div>
+            <div class="panel guide">
+              <div class="p-label">Guide - Year 2 - Ending A</div>
+              <div class="stat"><span class="bar"><i style="width: 62%;"></i></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>ffooll-bit / hm-sth-companion</span>
+      <span>MIT &middot; Live game info &amp; full walkthrough</span>
+    </div>
+  </div>
+</body>
+</html>

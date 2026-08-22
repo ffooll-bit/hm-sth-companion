@@ -1,11 +1,15 @@
-# HM STH Companion
+<div align="center">
+
+<h1>HM STH Companion</h1>
+
+<img src="docs/social-preview.png" alt="HM STH Companion - Windows companion tool for Harvest Moon: Save the Homeland on PCSX2 with live game memory info and a complete walkthrough guide">
+
+A Windows desktop companion app — live game info & full walkthrough for **Harvest Moon: Save the Homeland** on PCSX2.
 
 [![CI](https://github.com/ffooll-bit/hm-sth-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/ffooll-bit/hm-sth-companion/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
-A Windows desktop companion app for playing **Harvest Moon: Save the Homeland** (PCSX2).
-
-The app reads live game memory from the PCSX2 emulator and turns it into useful, real-time information, and bundles a complete walkthrough guide for finishing the game.
+</div>
 
 ## Features (planned)
 
