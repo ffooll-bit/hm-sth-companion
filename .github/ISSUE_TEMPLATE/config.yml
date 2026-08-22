@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerabilities
+    url: https://github.com/ffooll-bit/hm-sth-companion/blob/main/SECURITY.md
+    about: Please report security vulnerabilities through SECURITY.md, not as a public issue.
