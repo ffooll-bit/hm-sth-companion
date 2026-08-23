@@ -81,3 +81,51 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** An 'AI tooling' section was appended to `.gitignore` containing `.cortexkit/` and `.playwright-mcp/`; both directories no longer appear as untracked.
 - **Changes:** .gitignore gained the 'AI tooling' section; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
+
+### ENH-005 — CI never builds the application code
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 18:59
+- **Implemented:** `—`
+- **Problem:** The required `build` check only validates markdown hygiene (CRLF/BOM). Since PR #14 the repository contains a real .NET application, but no automation compiles it - a broken commit can merge with green checks.
+- **Possible Fix:** Extend ci.yml so the build job also runs `dotnet build` (and a formatting verification) on the solution, making the required check actually gate application code.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### DOC-001 — README has no getting-started instructions
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 18:59
+- **Implemented:** `—`
+- **Problem:** The README is marketing-style (introduction and badges only). There is no getting-started section: prerequisites (.NET 8 SDK, PCSX2 with PINE IPC enabled), build/run commands, or expected output. Anyone wanting to try the proof of concept must read the source to figure out how.
+- **Possible Fix:** Add a Getting Started section to README.md covering prerequisites, clone/build/run commands for src/HmSth.Poc, and what output to expect.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-006 — Integrate reverse-engineered gameplay memory locations
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 18:59
+- **Implemented:** `—`
+- **Problem:** The UI design spec renders stamina/money/weather as `--` because gameplay addresses were unknown, but valid Cheat Engine locations against running pcsx2-qt.exe have since been found (base `"pcsx2-qt.exe"+0317C238`): GOLD at offset `864`, STAMINA at `830`, TIME at `5F32F4`. Documented formats: STAMINA is 4 bytes `[maxFatigue, fatigue, maxStamina, stamina]` where max values normally match and shift with Power Berry count (e.g. `8C 00 8C 8C`; normal activity costs -2 stamina, rain -4 and raises fatigue; stamina 0 blocks activities, fatigue at max when YY=XX); TIME is `[season, day, hour, minute]` (e.g. `00 07 06 00`). Weather remains unfound.
+- **Possible Fix:** Document this memory map in its own doc, then add a reading layer that maps the three values into the app. Open items to resolve during implementation: the CE pointers live in host-process address space while PINE reads EE addresses, so choose between direct ReadProcessMemory on the host addresses (the already-planned fallback path) or deriving equivalent EE addresses for PINE; confirm the offset scale anomaly of TIME (`5F32F4` vs short offsets `864`/`830`); locate the weather address.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-007 — PINE framing logic has zero tests
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 18:59
+- **Implemented:** `—`
+- **Problem:** The POC's protocol logic (Request/ReadString/ReadU32: packet framing, result-code handling, string parsing) is pure and testable without an emulator, but no tests exist; this code will be carried into the real client unchanged.
+- **Possible Fix:** Add a small xUnit project covering framing and parsing edge cases (short reads, non-zero result codes, malformed string payloads), so the tests travel with the code into the real client.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
