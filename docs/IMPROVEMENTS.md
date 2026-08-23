@@ -119,16 +119,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### ENH-007 — PINE framing logic has zero tests
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #19
 - **Recorded:** 2026-08-23 18:59
-- **Implemented:** `—`
+- **Implemented:** 2026-08-24 02:19
 - **Problem:** The POC's protocol logic (Request/ReadString/ReadU32: packet framing, result-code handling, string parsing) is pure and testable without an emulator, but no tests exist; this code will be carried into the real client unchanged.
 - **Possible Fix:** Add a small xUnit project covering framing and parsing edge cases (short reads, non-zero result codes, malformed string payloads), so the tests travel with the code into the real client.
 - **Actual Fix:** Verified: no test project exists anywhere in the repository. Use xUnit v3 (official README: supports .NET 8.0+) in a small test project covering framing and parsing edge cases (short reads, non-zero result codes, malformed string payloads), executed via `dotnet test`. Implement after ENH-005 so the tests run automatically in CI.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** A test project `tests/HmSth.Poc.Tests` (xUnit v3 stable 4.0.0 via official templates, Microsoft Testing Platform) was created and added to the solution with a ProjectReference to the POC. `PineClient`/`PineCommand` moved to their own file as `public` (only production-code change; zero behaviour change). Thirteen facts exercise framing and parsing through an in-process loopback fake PCSX2: request frame shape for Read32 vs metadata opcodes, response sizes below six, non-zero result codes, connection closed before header and mid-body, string payloads of zero length / length beyond data / missing null terminator, and truncated u32 payloads. CI gained a `dotnet test --no-build` step after the build step, so the suite runs on every push.
+- **Changes:** Added tests/HmSth.Poc.Tests; src/HmSth.Poc/PineClient.cs split out of Program.cs (made public); HmSth.sln includes the test project; .github/workflows/ci.yml gained the Run tests step; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-008 — Verified EE anchor for TIME plus candidate map for further monitors
 - **Status:** `verified`
