@@ -9,6 +9,7 @@
 - Add PCSX2 PINE IPC proof of concept console app. (#9)
 - Add UI design specification. (#8)
 - Build the .NET solution in CI. (#17)
+- Add PINE IPC framing tests. (#19)
 
 ### Changed
 
