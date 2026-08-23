@@ -5,6 +5,7 @@
 ### Added
 
 - Initial repository structure.
+- Ignore local AI tooling directories. (#10)
 
 ### Changed
 
