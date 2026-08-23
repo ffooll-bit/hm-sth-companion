@@ -131,73 +131,73 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### ENH-008 — Verified EE anchor for TIME plus candidate map for further monitors
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Only three gameplay values are known to the project (GOLD, STAMINA, TIME), while community artifacts surfaced raw EE addresses that were never cross-checked against the companion's own Cheat Engine findings; without a confirmed host-to-EE correspondence every future monitor has to be hunted blind.
 - **Possible Fix:** Record the verified anchor from the open-source Save The Homeland Randomizer (GPL-3, hooks PCSX2): its scripts write day at EE `0x2085A2F6` and season at `0x2085A2F7`, and game code reads `0x2085A2F4`/`F5` immediately before them - almost certainly matching the discovered contiguous `[season, day, hour, minute]` dword, which makes `0x002085A2F4` the likely EE equivalent of the host pointer target. Use it as the bridge to derive EE addresses for GOLD/STAMINA and as the starting neighborhood (`0x2085A2E2-E8`) for the weather hunt. Additional candidates visible in the randomizer table: year (likely near the date struct), power berry count, item inventory slots at `0x20244xxx`.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified via three independent sources that lock together: (1) SaveTheHomelandRandomizer source writes day=`0x2085A2F6`, season=`0x2085A2F7`, and `UncappedEndings.lua` explicitly labels `0x2085A2F4` as time (writes value 1260); (2) Ushi No Tane GS2 season/day/hour codes sit on adjacent scrambled addresses (251B/251A/251C), consistent with one contiguous calendar struct; (3) GS2 Gold vs Energy prefixes differ by exactly 0x34, matching the discovered CE offsets delta (864 - 830 = 0x34). Final plan: record the anchor table in a dedicated memory-map doc during ENH-006 implementation; treat the `0x002085A2F4` region as primary candidate for deriving EE equivalents of GOLD/STAMINA; note hour/minute likely derive from a u16 minute counter (1260 = about 21:00) while the CE dword's HH/MM bytes are converted runtime copies; Cheat Engine observations remain primary evidence until live-read validation.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-009 — Daily briefing: weather today and tomorrow, shop open days
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Players must boot the in-game TV forecast every morning to learn today's and tomorrow's weather, and shop closures still surprise them mid-trip; neither is available at a glance while playing.
 - **Possible Fix:** Monitor today's weather and tomorrow's forecast once a weather address is found (no public raw address exists; hunt via Cheat Engine starting from the ENH-008 anchor neighborhood). Shop open/holiday status is served from curated online data instead of memory reading, since schedules are static.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified with a correction from live gameplay observation: the seasonal Dry/Mild/Wet calendar (Ushi No Tane `weather.php`) defines each day's probability distribution rather than a fixed outcome - actual weather is rolled randomly within those ranges, and the in-game TV forecast is only a prediction that can occasionally miss (percentage-based). Consequently tomorrow's weather cannot be computed reliably from the date alone; accurate display requires locating the weather values in memory via Cheat Engine - today's actual state and, if the game pre-rolls it, the next-day value. The static calendar stays useful as a fallback estimate and for presenting the odds alongside the monitored truth. Shop data confirmed complete: Ushi No Tane `townshops.php` lists all 8 shops with opening hours and closed weekdays, suitable as curated static content.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-010 — Active item and tool slot monitor
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** HM:StH keeps two equip slots (active item and active tool); the active tool is invisible during gameplay and only revealed after pausing, which breaks flow whenever the player must confirm what is equipped.
 - **Possible Fix:** Read both equip slots live and display item/tool identities in the HUD. Slot addresses unknown; hunt via Cheat Engine by switching equipment and diffing.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified: no public raw address exists for the equip slots; the problem stands and the approach is unchanged - Cheat Engine diff-hunt by switching equipment. The randomizer's runtime clusters (for example `0x202729xx` in its table) provide starting neighborhoods for the scan.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-011 — Save profile dashboard
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Long-term progress facts are scattered across pause menus or locked behind endings: livestock product levels (none/small/medium/large/golden), pet names and hearts, horse race time-attack results, fish catch counts including the three legendary fish and the biggest-catch record, completed endings out of nine, unlocked character profiles, and full bag and fridge inventories.
 - **Possible Fix:** Locate and read the save-state block to surface all listed facts in one panel. Character profiles are deliberately read from game memory rather than online lists, because unlock state differs per save file.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified with strengthened anchors: the randomizer's ending scripts write ending progression refs (`0x20267750`, `0x20267724`, cutscene status `0x2026776C`) inside the save-persistent struct region around `0x2085A2xx`, localizing where endings state lives. Inventory id/count pairs are anchored at `0x20244xxx`. Livestock products, pets/hearts, race results, fishing records, and character profiles have no public map and proceed as planned via Cheat Engine hunts against that save block; reading profiles from game memory rather than online lists is confirmed as the right approach since unlock state differs per save.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-012 — Farm operations monitor: crops, animal care, tool condition, fodder
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Field and barn upkeep state requires walking everywhere or opening many menus: whether each planted crop is watered or harvest-ready, whether each cow/chicken was brushed, milked, or fed (outdoor animals need no feeding), remaining uses of depletable tools such as the watering can and chicken feed, sickle/fishing-rod upgrade tiers, and the barn fodder counter that grows by cutting grass plots.
 - **Possible Fix:** Map the crop plot array and animal state records, then display an upkeep checklist. Barn fodder is expected to live in a separate counter distinct from inventory fodder.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified: no public raw addresses exist for crop plots, animal care flags, tool condition, or the barn fodder counter; none of the community artifacts touch these systems. Approach unchanged - Cheat Engine hunts with state transitions (water/don't water, brush/milk/feed, cut grass). The inventory-side fodder count is expected at the `0x20244xxx` id/count pairs, while the barn counter is anticipated as a separate value; the distinction will be confirmed during the hunt.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-013 — Live world map with real-time NPC and animal positions
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Finding specific villagers without memorizing their daily schedules wastes significant playtime; nothing in-game shows where characters currently are.
 - **Possible Fix:** Render an in-app map with live positions of villagers and animals. This is the highest-difficulty item of the batch: entity coordinates may be transient or unstable in memory - flagged as exploratory and may be descoped after initial Cheat Engine probing.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified as exploratory: no public source documents entity coordinate storage, and none of the community artifacts (randomizer, cheat listings) touch NPC or animal positions. The high-risk assessment stands; initial Cheat Engine probing against moving villagers will decide whether the item proceeds or is descoped.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
