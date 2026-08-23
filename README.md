@@ -34,6 +34,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow, commit styl
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community standards.
+
+See [SECURITY.md](SECURITY.md) for the security policy.
+
 ## License
 
 Distributed under the [MIT License](LICENSE).

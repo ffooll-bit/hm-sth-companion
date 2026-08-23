@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea for HM STH Companion
-title: "[Feature] "
+title: ""
 labels: enhancement
 assignees: ''
 ---

@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a problem with HM STH Companion
-title: "[Bug] "
+title: ""
 labels: bug
 assignees: ''
 ---
