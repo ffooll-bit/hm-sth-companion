@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build solution
+        run: dotnet build
       - name: Check line endings
         run: |
           if grep -rlP '\r$' --include="*.md" .; then

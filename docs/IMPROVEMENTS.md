@@ -83,16 +83,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** .gitignore gained the 'AI tooling' section; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-005 — CI never builds the application code
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #17
 - **Recorded:** 2026-08-23 18:59
-- **Implemented:** `—`
+- **Implemented:** 2026-08-24 01:46
 - **Problem:** The required `build` check only validates markdown hygiene (CRLF/BOM). Since PR #14 the repository contains a real .NET application, but no automation compiles it - a broken commit can merge with green checks.
 - **Possible Fix:** Extend ci.yml so the build job also runs `dotnet build` (and a formatting verification) on the solution, making the required check actually gate application code.
 - **Actual Fix:** Verified against ci.yml (only markdown CRLF/BOM checks exist) and the official actions/setup-dotnet README (current major v6; pin `dotnet-version: '8.0.x'` or the runner silently uses its preinstalled latest SDK). Add `actions/setup-dotnet@v6` pinned to 8.0.x plus a solution-wide `dotnet build` to the existing build job. The formatting verification from the initial plan is dropped: `dotnet build` alone is the compilation gate, formatting stays a local pre-flight before each commit.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** A minimal solution `HmSth.sln` was created at the repository root containing `src/HmSth.Poc`, so `dotnet build` resolves without an explicit path and future projects (the planned test project) join by one `dotnet sln add`. The CI `build` job gained `actions/setup-dotnet@v6` pinned to `8.0.x` followed by a solution-wide `dotnet build` step; the markdown hygiene checks are unchanged. Verified locally with the same commands before commit.
+- **Changes:** Added HmSth.sln; .github/workflows/ci.yml gained the setup-dotnet and Build solution steps; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### DOC-001 — README has no getting-started instructions
 - **Status:** `verified`
