@@ -47,16 +47,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** Initial repository skeleton: README.md, CHANGELOG.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, .github/ workflows and templates, docs/IMPROVEMENTS.md, src/.gitkeep.
 
 ### ENH-002 — Application UI design specification
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #8
 - **Recorded:** 2026-08-22 19:55
-- **Implemented:** `—`
+- **Implemented:** 2026-08-23 18:09
 - **Problem:** The application has no defined interface plan yet — without an agreed set of screens, layouts, and a visual theme, feature implementation would be unguided and inconsistent.
 - **Possible Fix:** Produce a UI design specification covering the required interfaces (live HUD dashboard, memory monitor, guide browser, settings), the layout of each screen, and the visual theme, reviewed against the data actually available from the memory reading mechanism (ENH-003) before implementation starts.
 - **Actual Fix:** Produce the UI design specification after ENH-003, mapping every interface element to gameplay values actually readable from PCSX2 via PINE IPC. Constraint discovered during verification: WinForms on .NET 8 ships no built-in dark mode, so the visual theme needs a custom palette/renderer; the spec must define the screens (HUD dashboard, memory monitor, guide browser, settings), their layouts, and that theme explicitly.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** `docs/UI_DESIGN_SPEC.md` defines the main window: three application states (disconnected / wrong game / playing), a two-column layout mirroring the social preview mock window (Game HUD + Memory Monitor, full-width Guide), a data contract mapping every element to proven PINE IPC reads with graceful `--` rendering for gameplay addresses not yet located, and a theme token table copied verbatim from the social preview palette (dark surfaces, accent #58a55c, Segoe UI + Consolas). WinForms dark-mode caveat recorded for re-check at implementation time.
+- **Changes:** Added docs/UI_DESIGN_SPEC.md; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-003 — PCSX2 connection, game detection & memory reading POC
 - **Status:** `implemented`
