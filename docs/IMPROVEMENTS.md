@@ -59,16 +59,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### ENH-003 — PCSX2 connection, game detection & memory reading POC
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #9
 - **Recorded:** 2026-08-22 19:55
-- **Implemented:** `—`
+- **Implemented:** 2026-08-23 17:47
 - **Problem:** The core pipeline does not exist yet — the application cannot attach to the PCSX2 process, cannot confirm that the running game is Harvest Moon: Save the Homeland, and cannot read gameplay values from memory.
 - **Possible Fix:** Console-app proof of concept using ReadProcessMemory (P/Invoke) against pcsx2.exe: locate the PS2 EE RAM base via a pointer chain (Cheat Engine table style), detect the game by scanning for the disc serial SLUS-20141 at its standard EE RAM location (fallback: PCSX2 window title), then read known addresses for stamina/money/weather and print live values. Priority 1 — every other item depends on this working.
 - **Actual Fix:** Console-app proof of concept using the PINE IPC interface built into PCSX2 (TCP 127.0.0.1:28011 on Windows, enabled by the user in Settings): detect the game from the PINE metadata opcodes (serial/title/CRC) instead of memory scanning — correct US serial is SLUS-20251 (ELF SLUS_202.51), confirmed via redump.org, psxdatacenter, GameFAQs; then Read32 gameplay values at EE RAM addresses for stamina/money/weather once located with Cheat Engine. PINE reads EE addresses directly, eliminating fragile base-address discovery; keep ReadProcessMemory+EEmem only as fallback when IPC is disabled. Caveats: IPC must be toggled on per user, requests should stay sequential (queue drops past ~7 in-flight), no bulk-read opcode (~52 ms per 4 KiB). Priority 1 — every other item depends on this working.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** A .NET 8 console project `src/HmSth.Poc` speaks the PINE IPC protocol directly over TCP 127.0.0.1:28011: strict sequential request/reply framing ([u16 size][opcode] -> [u16 size][result][data]), string metadata reads for emulator version / title / serial (ID opcode), a Read32 demo at an aligned EE RAM address, and game verification against serial SLUS-20251. Exit codes separate not-connected (prints the enablement hint), wrong-game, and success; build passes and the not-connected path was exercised locally - the live pass against running PCSX2 happens on the user's machine by design of a proof of concept.
+- **Changes:** Added src/HmSth.Poc (csproj + Program.cs, zero NuGet packages); removed src/.gitkeep; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-004 — Local AI tooling artifacts not gitignored
 - **Status:** `implemented`
