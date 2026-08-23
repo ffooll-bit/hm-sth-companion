@@ -48,7 +48,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-002 — Application UI design specification
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #8
 - **Recorded:** 2026-08-22 19:55
 - **Implemented:** `—`
 - **Problem:** The application has no defined interface plan yet — without an agreed set of screens, layouts, and a visual theme, feature implementation would be unguided and inconsistent.
@@ -60,7 +60,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-003 — PCSX2 connection, game detection & memory reading POC
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #9
 - **Recorded:** 2026-08-22 19:55
 - **Implemented:** `—`
 - **Problem:** The core pipeline does not exist yet — the application cannot attach to the PCSX2 process, cannot confirm that the running game is Harvest Moon: Save the Homeland, and cannot read gameplay values from memory.
@@ -72,7 +72,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-004 — Local AI tooling artifacts not gitignored
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #10
 - **Recorded:** 2026-08-22 20:15
 - **Implemented:** `—`
 - **Problem:** Local AI tooling directories such as `.cortexkit/` (Magic Context session data) keep showing up as untracked changes, keeping `git status` dirty and risking an accidental commit of internal tooling data to the public repository.
