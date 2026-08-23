@@ -4,7 +4,7 @@
 
 ### Added
 
-- _New features, one line each, referencing the issue if applicable._
+- Add PCSX2 PINE IPC proof of concept console app. (#9)
 
 ### Changed
 
