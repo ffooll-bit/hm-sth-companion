@@ -4,7 +4,7 @@
 
 ### Added
 
-- _New features, one line each, referencing the issue if applicable._
+- Ignore local AI tooling directories. (#10)
 
 ### Changed
 
