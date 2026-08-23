@@ -129,3 +129,75 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
+
+### ENH-008 — Verified EE anchor for TIME plus candidate map for further monitors
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 19:52
+- **Implemented:** `—`
+- **Problem:** Only three gameplay values are known to the project (GOLD, STAMINA, TIME), while community artifacts surfaced raw EE addresses that were never cross-checked against the companion's own Cheat Engine findings; without a confirmed host-to-EE correspondence every future monitor has to be hunted blind.
+- **Possible Fix:** Record the verified anchor from the open-source Save The Homeland Randomizer (GPL-3, hooks PCSX2): its scripts write day at EE `0x2085A2F6` and season at `0x2085A2F7`, and game code reads `0x2085A2F4`/`F5` immediately before them - almost certainly matching the discovered contiguous `[season, day, hour, minute]` dword, which makes `0x002085A2F4` the likely EE equivalent of the host pointer target. Use it as the bridge to derive EE addresses for GOLD/STAMINA and as the starting neighborhood (`0x2085A2E2-E8`) for the weather hunt. Additional candidates visible in the randomizer table: year (likely near the date struct), power berry count, item inventory slots at `0x20244xxx`.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-009 — Daily briefing: weather today and tomorrow, shop open days
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 19:52
+- **Implemented:** `—`
+- **Problem:** Players must boot the in-game TV forecast every morning to learn today's and tomorrow's weather, and shop closures still surprise them mid-trip; neither is available at a glance while playing.
+- **Possible Fix:** Monitor today's weather and tomorrow's forecast once a weather address is found (no public raw address exists; hunt via Cheat Engine starting from the ENH-008 anchor neighborhood). Shop open/holiday status is served from curated online data instead of memory reading, since schedules are static.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-010 — Active item and tool slot monitor
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 19:52
+- **Implemented:** `—`
+- **Problem:** HM:StH keeps two equip slots (active item and active tool); the active tool is invisible during gameplay and only revealed after pausing, which breaks flow whenever the player must confirm what is equipped.
+- **Possible Fix:** Read both equip slots live and display item/tool identities in the HUD. Slot addresses unknown; hunt via Cheat Engine by switching equipment and diffing.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-011 — Save profile dashboard
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 19:52
+- **Implemented:** `—`
+- **Problem:** Long-term progress facts are scattered across pause menus or locked behind endings: livestock product levels (none/small/medium/large/golden), pet names and hearts, horse race time-attack results, fish catch counts including the three legendary fish and the biggest-catch record, completed endings out of nine, unlocked character profiles, and full bag and fridge inventories.
+- **Possible Fix:** Locate and read the save-state block to surface all listed facts in one panel. Character profiles are deliberately read from game memory rather than online lists, because unlock state differs per save file.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-012 — Farm operations monitor: crops, animal care, tool condition, fodder
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 19:52
+- **Implemented:** `—`
+- **Problem:** Field and barn upkeep state requires walking everywhere or opening many menus: whether each planted crop is watered or harvest-ready, whether each cow/chicken was brushed, milked, or fed (outdoor animals need no feeding), remaining uses of depletable tools such as the watering can and chicken feed, sickle/fishing-rod upgrade tiers, and the barn fodder counter that grows by cutting grass plots.
+- **Possible Fix:** Map the crop plot array and animal state records, then display an upkeep checklist. Barn fodder is expected to live in a separate counter distinct from inventory fodder.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-013 — Live world map with real-time NPC and animal positions
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-23 19:52
+- **Implemented:** `—`
+- **Problem:** Finding specific villagers without memorizing their daily schedules wastes significant playtime; nothing in-game shows where characters currently are.
+- **Possible Fix:** Render an in-app map with live positions of villagers and animals. This is the highest-difficulty item of the batch: entity coordinates may be transient or unstable in memory - flagged as exploratory and may be descoped after initial Cheat Engine probing.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
