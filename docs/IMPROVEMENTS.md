@@ -35,16 +35,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 ## Items
 
 ### ENH-001 — Repository structure not verified against the standard
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** `—`
 - **Recorded:** 2026-08-22 17:02
-- **Implemented:** `—`
+- **Implemented:** 2026-08-23 17:29
 - **Problem:** The repository is newly created and its folders, guardrail files, and settings have not yet been confirmed against the workflow standard.
 - **Possible Fix:** Run the verification checks from the workflow before the first commit.
 - **Actual Fix:** Verification was performed during bootstrap interaction 1 against the Project Bootstrap standard; the violations found then (CHANGELOG placement, hardwrapped documents, CoC placeholder) were fixed and merged via PR #1. Re-checked on 2026-08-22: structure still conforms.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** The repository structure was created during Project Bootstrap interaction 1 and merged via PR #1; the review-gate violations (CHANGELOG placement, hardwrapped documents, CoC front matter and placeholder) were fixed in the same pull request. Structure re-verified against the bootstrap standard on 2026-08-23.
+- **Changes:** Initial repository skeleton: README.md, CHANGELOG.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, .github/ workflows and templates, docs/IMPROVEMENTS.md, src/.gitkeep.
 
 ### ENH-002 — Application UI design specification
 - **Status:** `verified`
