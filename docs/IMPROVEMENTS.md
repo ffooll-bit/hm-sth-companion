@@ -35,16 +35,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 ## Items
 
 ### ENH-001 — Repository structure not verified against the standard
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** `—`
 - **Recorded:** 2026-08-22 17:02
-- **Implemented:** `—`
+- **Implemented:** 2026-08-23 17:29
 - **Problem:** The repository is newly created and its folders, guardrail files, and settings have not yet been confirmed against the workflow standard.
 - **Possible Fix:** Run the verification checks from the workflow before the first commit.
 - **Actual Fix:** Verification was performed during bootstrap interaction 1 against the Project Bootstrap standard; the violations found then (CHANGELOG placement, hardwrapped documents, CoC placeholder) were fixed and merged via PR #1. Re-checked on 2026-08-22: structure still conforms.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** The repository structure was created during Project Bootstrap interaction 1 and merged via PR #1; the review-gate violations (CHANGELOG placement, hardwrapped documents, CoC front matter and placeholder) were fixed in the same pull request. Structure re-verified against the bootstrap standard on 2026-08-23.
+- **Changes:** Initial repository skeleton: README.md, CHANGELOG.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, .github/ workflows and templates, docs/IMPROVEMENTS.md, src/.gitkeep.
 
 ### ENH-002 — Application UI design specification
 - **Status:** `verified`
@@ -71,13 +71,13 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** Added src/HmSth.Poc (csproj + Program.cs, zero NuGet packages); removed src/.gitkeep; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-004 — Local AI tooling artifacts not gitignored
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #10
 - **Recorded:** 2026-08-22 20:15
-- **Implemented:** `—`
-- **Problem:** Local AI tooling directories such as `.cortexkit/` (Magic Context session data) keep showing up as untracked changes, keeping `git status` dirty and risking an accidental commit of internal tooling data to the public repository.
+- **Implemented:** 2026-08-23 17:33
+- **Problem:** Local AI tooling directories such as `.cortexkit/` keep showing up as untracked changes. This keeps `git status` dirty and risks an accidental commit of internal tooling data to the public repository.
 - **Possible Fix:** Add tooling artifact entries (`.cortexkit/`, plus `.playwright-mcp/` for future web testing sessions) to `.gitignore`.
 - **Actual Fix:** Add an 'AI tooling' section to `.gitignore` with entries `.cortexkit/` and `.playwright-mcp/`. Verified against official gitignore semantics (git-scm.com): trailing-slash patterns match directories only, so both tooling roots are ignored entirely regardless of nested content — the plugin's own nested `.gitignore` does not prevent the untracked-directory report. No application code involved.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** An 'AI tooling' section was appended to `.gitignore` containing `.cortexkit/` and `.playwright-mcp/`; both directories no longer appear as untracked.
+- **Changes:** .gitignore gained the 'AI tooling' section; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
