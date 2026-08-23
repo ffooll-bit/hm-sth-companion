@@ -7,6 +7,7 @@
 - Initial repository structure.
 - Ignore local AI tooling directories. (#10)
 - Add PCSX2 PINE IPC proof of concept console app. (#9)
+- Add UI design specification. (#8)
 
 ### Changed
 
