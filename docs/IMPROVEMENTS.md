@@ -83,49 +83,49 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** .gitignore gained the 'AI tooling' section; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-005 — CI never builds the application code
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The required `build` check only validates markdown hygiene (CRLF/BOM). Since PR #14 the repository contains a real .NET application, but no automation compiles it - a broken commit can merge with green checks.
 - **Possible Fix:** Extend ci.yml so the build job also runs `dotnet build` (and a formatting verification) on the solution, making the required check actually gate application code.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified against ci.yml (only markdown CRLF/BOM checks exist) and the official actions/setup-dotnet README (current major v6; pin `dotnet-version: '8.0.x'` or the runner silently uses its preinstalled latest SDK). Add `actions/setup-dotnet@v6` pinned to 8.0.x plus a solution-wide `dotnet build` to the existing build job. The formatting verification from the initial plan is dropped: `dotnet build` alone is the compilation gate, formatting stays a local pre-flight before each commit.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### DOC-001 — README has no getting-started instructions
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The README is marketing-style (introduction and badges only). There is no getting-started section: prerequisites (.NET 8 SDK, PCSX2 with PINE IPC enabled), build/run commands, or expected output. Anyone wanting to try the proof of concept must read the source to figure out how.
 - **Possible Fix:** Add a Getting Started section to README.md covering prerequisites, clone/build/run commands for src/HmSth.Poc, and what output to expect.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified: the problem is narrower than recorded - README already has Requirements and Quick start sections, but neither helps try the POC (Quick start still says "Not available yet" and points to Releases; .NET 8 SDK prerequisite and PINE IPC enabling are unmentioned). Revise the existing sections instead of adding new ones: Requirements gains ".NET 8 SDK"; Quick start becomes developer instructions - enable PINE IPC in PCSX2 settings (TCP 127.0.0.1:28011, verified during ENH-003), run `dotnet run --project src/HmSth.Poc`, document expected output and exit codes 0/1/2.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-006 — Integrate reverse-engineered gameplay memory locations
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The UI design spec renders stamina/money/weather as `--` because gameplay addresses were unknown, but valid Cheat Engine locations against running pcsx2-qt.exe have since been found (base `"pcsx2-qt.exe"+0317C238`): GOLD at offset `864`, STAMINA at `830`, TIME at `5F32F4`. Documented formats: STAMINA is 4 bytes `[maxFatigue, fatigue, maxStamina, stamina]` where max values normally match and shift with Power Berry count (e.g. `8C 00 8C 8C`; normal activity costs -2 stamina, rain -4 and raises fatigue; stamina 0 blocks activities, fatigue at max when YY=XX); TIME is `[season, day, hour, minute]` (e.g. `00 07 06 00`). Weather remains unfound.
 - **Possible Fix:** Document this memory map in its own doc, then add a reading layer that maps the three values into the app. Open items to resolve during implementation: the CE pointers live in host-process address space while PINE reads EE addresses, so choose between direct ReadProcessMemory on the host addresses (the already-planned fallback path) or deriving equivalent EE addresses for PINE; confirm the offset scale anomaly of TIME (`5F32F4` vs short offsets `864`/`830`); locate the weather address.
-- **Actual Fix:** `—`
+- **Actual Fix:** Online verification corroborates without contradicting: Ushi No Tane GS2 codes place day/hour on adjacent addresses (consistent with the contiguous `[season, day, hour, minute]` layout), and NTSC-U Never Tired / Infinite Money cheat listings (IGN, Almar's Guides, supercheats) confirm stamina/gold targets exist in this memory region. The user's live Cheat Engine observations remain primary evidence; final validation happens when the implementation reads live values. Plan unchanged: document the memory map in its own doc, then add a reading layer mapping GOLD/STAMINA/TIME into the app, resolving the three open items (RPM-on-host vs derived EE addresses for PINE, the TIME offset scale anomaly, the missing weather address).
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-007 — PINE framing logic has zero tests
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The POC's protocol logic (Request/ReadString/ReadU32: packet framing, result-code handling, string parsing) is pure and testable without an emulator, but no tests exist; this code will be carried into the real client unchanged.
 - **Possible Fix:** Add a small xUnit project covering framing and parsing edge cases (short reads, non-zero result codes, malformed string payloads), so the tests travel with the code into the real client.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified: no test project exists anywhere in the repository. Use xUnit v3 (official README: supports .NET 8.0+) in a small test project covering framing and parsing edge cases (short reads, non-zero result codes, malformed string payloads), executed via `dotnet test`. Implement after ENH-005 so the tests run automatically in CI.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
