@@ -84,7 +84,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-005 — CI never builds the application code
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #17
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The required `build` check only validates markdown hygiene (CRLF/BOM). Since PR #14 the repository contains a real .NET application, but no automation compiles it - a broken commit can merge with green checks.
@@ -96,7 +96,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### DOC-001 — README has no getting-started instructions
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #16
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The README is marketing-style (introduction and badges only). There is no getting-started section: prerequisites (.NET 8 SDK, PCSX2 with PINE IPC enabled), build/run commands, or expected output. Anyone wanting to try the proof of concept must read the source to figure out how.
@@ -108,7 +108,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-006 — Integrate reverse-engineered gameplay memory locations
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #18
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The UI design spec renders stamina/money/weather as `--` because gameplay addresses were unknown, but valid Cheat Engine locations against running pcsx2-qt.exe have since been found (base `"pcsx2-qt.exe"+0317C238`): GOLD at offset `864`, STAMINA at `830`, TIME at `5F32F4`. Documented formats: STAMINA is 4 bytes `[maxFatigue, fatigue, maxStamina, stamina]` where max values normally match and shift with Power Berry count (e.g. `8C 00 8C 8C`; normal activity costs -2 stamina, rain -4 and raises fatigue; stamina 0 blocks activities, fatigue at max when YY=XX); TIME is `[season, day, hour, minute]` (e.g. `00 07 06 00`). Weather remains unfound.
@@ -120,7 +120,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-007 — PINE framing logic has zero tests
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #19
 - **Recorded:** 2026-08-23 18:59
 - **Implemented:** `—`
 - **Problem:** The POC's protocol logic (Request/ReadString/ReadU32: packet framing, result-code handling, string parsing) is pure and testable without an emulator, but no tests exist; this code will be carried into the real client unchanged.
@@ -132,7 +132,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-008 — Verified EE anchor for TIME plus candidate map for further monitors
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #20
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Only three gameplay values are known to the project (GOLD, STAMINA, TIME), while community artifacts surfaced raw EE addresses that were never cross-checked against the companion's own Cheat Engine findings; without a confirmed host-to-EE correspondence every future monitor has to be hunted blind.
@@ -144,7 +144,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-009 — Daily briefing: weather today and tomorrow, shop open days
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #21
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Players must boot the in-game TV forecast every morning to learn today's and tomorrow's weather, and shop closures still surprise them mid-trip; neither is available at a glance while playing.
@@ -156,7 +156,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-010 — Active item and tool slot monitor
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #22
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** HM:StH keeps two equip slots (active item and active tool); the active tool is invisible during gameplay and only revealed after pausing, which breaks flow whenever the player must confirm what is equipped.
@@ -168,7 +168,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-011 — Save profile dashboard
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #23
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Long-term progress facts are scattered across pause menus or locked behind endings: livestock product levels (none/small/medium/large/golden), pet names and hearts, horse race time-attack results, fish catch counts including the three legendary fish and the biggest-catch record, completed endings out of nine, unlocked character profiles, and full bag and fridge inventories.
@@ -180,7 +180,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-012 — Farm operations monitor: crops, animal care, tool condition, fodder
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #24
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Field and barn upkeep state requires walking everywhere or opening many menus: whether each planted crop is watered or harvest-ready, whether each cow/chicken was brushed, milked, or fed (outdoor animals need no feeding), remaining uses of depletable tools such as the watering can and chicken feed, sickle/fishing-rod upgrade tiers, and the barn fodder counter that grows by cutting grass plots.
@@ -192,7 +192,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-013 — Live world map with real-time NPC and animal positions
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #25
 - **Recorded:** 2026-08-23 19:52
 - **Implemented:** `—`
 - **Problem:** Finding specific villagers without memorizing their daily schedules wastes significant playtime; nothing in-game shows where characters currently are.
