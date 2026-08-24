@@ -131,16 +131,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** Added tests/HmSth.Poc.Tests; src/HmSth.Poc/PineClient.cs split out of Program.cs (made public); HmSth.sln includes the test project; .github/workflows/ci.yml gained the Run tests step; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-008 — Verified EE anchor for TIME plus candidate map for further monitors
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #20
 - **Recorded:** 2026-08-23 19:52
-- **Implemented:** `—`
+- **Implemented:** 2026-08-24 12:47
 - **Problem:** Only three gameplay values are known to the project (GOLD, STAMINA, TIME), while community artifacts surfaced raw EE addresses that were never cross-checked against the companion's own Cheat Engine findings; without a confirmed host-to-EE correspondence every future monitor has to be hunted blind.
 - **Possible Fix:** Record the verified anchor from the open-source Save The Homeland Randomizer (GPL-3, hooks PCSX2): its scripts write day at EE `0x2085A2F6` and season at `0x2085A2F7`, and game code reads `0x2085A2F4`/`F5` immediately before them - almost certainly matching the discovered contiguous `[season, day, hour, minute]` dword, which makes `0x002085A2F4` the likely EE equivalent of the host pointer target. Use it as the bridge to derive EE addresses for GOLD/STAMINA and as the starting neighborhood (`0x2085A2E2-E8`) for the weather hunt. Additional candidates visible in the randomizer table: year (likely near the date struct), power berry count, item inventory slots at `0x20244xxx`.
-- **Actual Fix:** Verified via three independent sources that lock together: (1) SaveTheHomelandRandomizer source writes day=`0x2085A2F6`, season=`0x2085A2F7`, and `UncappedEndings.lua` explicitly labels `0x2085A2F4` as time (writes value 1260); (2) Ushi No Tane GS2 season/day/hour codes sit on adjacent scrambled addresses (251B/251A/251C), consistent with one contiguous calendar struct; (3) GS2 Gold vs Energy prefixes differ by exactly 0x34, matching the discovered CE offsets delta (864 - 830 = 0x34). Final plan: record the anchor table in a dedicated memory-map doc during ENH-006 implementation; treat the `0x002085A2F4` region as primary candidate for deriving EE equivalents of GOLD/STAMINA; note hour/minute likely derive from a u16 minute counter (1260 = about 21:00) while the CE dword's HH/MM bytes are converted runtime copies; Cheat Engine observations remain primary evidence until live-read validation.
+- **Actual Fix:** Verified via three independent sources that lock together: (1) SaveTheHomelandRandomizer source writes day=`0x2085A2F6`, season=`0x2085A2F7`, and `UncappedEndings.lua` explicitly labels `0x2085A2F4` as time (writes value 1260); (2) Ushi No Tane GS2 season/day/hour codes sit on adjacent scrambled addresses (251B/251A/251C), consistent with one contiguous calendar struct; (3) GS2 Gold vs Energy prefixes differ by exactly 0x34, matching the discovered CE offsets delta (864 - 830 = 0x34). Created `docs/MEMORY_MAP.md` recording the verified TIME anchor, the GS2/CE delta correlation for deriving GOLD/STAMINA EE candidates, the weather hunt neighborhood, additional candidates (year, power berry, inventory), and the open items to resolve during ENH-006 (RPM vs derived EE, TIME scale anomaly, weather address, hour/minute encoding).
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Created `docs/MEMORY_MAP.md` as a dedicated memory-map reference documenting the verified EE TIME anchor at `0x002085A2F4` (contiguous `[season, day, hour, minute]` dword), the GS2/CE delta `0x34` correlation for deriving GOLD/STAMINA EE candidates, the weather hunt neighborhood `0x2085A2E2–E8`, additional candidates from the randomizer (year, power berry count, inventory at `0x20244xxx`), and a validation policy distinguishing Cheat Engine primary evidence from live-read final validation. Four open items recorded for ENH-006 resolution.
+- **Changes:** Added docs/MEMORY_MAP.md; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-009 — Daily briefing: weather today and tomorrow, shop open days
 - **Status:** `verified`
