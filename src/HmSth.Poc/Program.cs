@@ -41,6 +41,12 @@ internal static class Program
             return 2;
         }
 
+        var reader = new GameMemoryReader(pine);
+        Console.WriteLine($"Gold     : {reader.ReadGold()}");
+        Console.WriteLine($"Stamina  : {reader.ReadStamina()}");
+        Console.WriteLine($"Time     : {reader.ReadTime()}");
+        Console.WriteLine($"Weather  : {reader.ReadWeather()}");
+
         Console.WriteLine("OK: game detected and memory transport verified.");
         return 0;
     }

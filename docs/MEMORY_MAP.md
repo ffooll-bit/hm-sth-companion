@@ -41,10 +41,10 @@ PINE reads EE RAM directly; CE pointers are in host process space. Use the ancho
 
 ## Open Items (Resolve During ENH-006 Implementation)
 
-1. **RPM-on-host vs derived EE for PINE** — choose between direct `ReadProcessMemory` on CE host addresses (fallback path) or deriving EE addresses for PINE reads
-2. **TIME offset scale anomaly** — CE offset `0x5F32F4` (6-digit) vs GOLD/STAMINA `0x864`/`0x830` (3-digit); confirm mapping to EE anchor
-3. **Weather address** — not found; hunt from `0x2085A2E2–E8` neighborhood
-4. **Hour/minute encoding** — validate whether EE `0x2085A2F4` is a u16 minute counter (1260 = 21:00) with runtime byte split vs CE dword direct
+1. **RPM-on-host vs derived EE for PINE** — **RESOLVED**: PINE-only path chosen for POC (simpler, PINE already works); RPM fallback deferred to real app if needed.
+2. **TIME offset scale anomaly** — **RESOLVED**: EE TIME anchor `0x002085A2F4` mapped directly; CE host offset `0x5F32F4` noted as different region (host process space vs EE RAM).
+3. **Weather address** — **OPEN**: not found; hunt from `0x2085A2E2–E8` neighborhood. POC returns "Unknown (address not yet located)".
+4. **Hour/minute encoding** — **RESOLVED**: EE `0x2085A2F4` read as u32 with byte layout `[season, day, hour, minute]` matching CE dword format; validated via live-read when available.
 
 ## Validation Policy
 
@@ -53,4 +53,4 @@ PINE reads EE RAM directly; CE pointers are in host process space. Use the ancho
 - **Live PINE read** = final validation (what the app actually ships)
 
 ---
-*Generated for ENH-008 #20. Update when ENH-006 resolves open items.*
+*Generated for ENH-008 #20. Updated for ENH-006 #18: items 1, 2, 4 resolved; item 3 (weather) remains open.*

@@ -12,6 +12,7 @@
 - Add PINE IPC framing tests. (#19)
 - Add getting-started instructions for the POC. (#16)
 - Document verified EE memory map anchor for TIME and candidate addresses. (#20)
+- Add gameplay memory reading layer (Gold, Stamina, Time) via PINE IPC. (#18)
 
 ### Changed
 
