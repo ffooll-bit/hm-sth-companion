@@ -95,16 +95,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** Added HmSth.sln; .github/workflows/ci.yml gained the setup-dotnet and Build solution steps; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### DOC-001 — README has no getting-started instructions
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #16
 - **Recorded:** 2026-08-23 18:59
-- **Implemented:** `—`
+- **Implemented:** 2026-08-24 12:28
 - **Problem:** The README is marketing-style (introduction and badges only). There is no getting-started section: prerequisites (.NET 8 SDK, PCSX2 with PINE IPC enabled), build/run commands, or expected output. Anyone wanting to try the proof of concept must read the source to figure out how.
 - **Possible Fix:** Add a Getting Started section to README.md covering prerequisites, clone/build/run commands for src/HmSth.Poc, and what output to expect.
 - **Actual Fix:** Verified: the problem is narrower than recorded - README already has Requirements and Quick start sections, but neither helps try the POC (Quick start still says "Not available yet" and points to Releases; .NET 8 SDK prerequisite and PINE IPC enabling are unmentioned). Revise the existing sections instead of adding new ones: Requirements gains ".NET 8 SDK"; Quick start becomes developer instructions - enable PINE IPC in PCSX2 settings (TCP 127.0.0.1:28011, verified during ENH-003), run `dotnet run --project src/HmSth.Poc`, document expected output and exit codes 0/1/2.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Revised the existing Requirements and Quick start sections in README.md. Requirements now lists .NET 8 SDK and PINE IPC enablement with the TCP endpoint. Quick start provides the exact `dotnet run` command, expected success output (emulator version, title, serial, demo memory read), and documents exit codes 0/1/2 with their meanings.
+- **Changes:** README.md updated (Requirements + Quick start sections rewritten); docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-006 — Integrate reverse-engineered gameplay memory locations
 - **Status:** `verified`
