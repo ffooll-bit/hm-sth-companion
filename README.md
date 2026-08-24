@@ -22,11 +22,30 @@ A Windows desktop companion app — live game info & full walkthrough for **Harv
 ## Requirements
 
 - Windows 10/11 (x64).
-- PCSX2 emulator running Harvest Moon: Save the Homeland.
+- .NET 8 SDK.
+- PCSX2 emulator running Harvest Moon: Save the Homeland with PINE IPC enabled (Settings → PINE IPC, TCP `127.0.0.1:28011`).
 
 ## Quick start
 
-Not available yet — the first release is being built. Once released, download the latest single-file executable from [Releases](https://github.com/ffooll-bit/hm-sth-companion/releases).
+Enable PINE IPC in PCSX2 settings, then run the proof of concept:
+
+```bash
+dotnet run --project src/HmSth.Poc
+```
+
+Expected output on success (exit code 0):
+
+```
+Emulator version: 2.0.2
+Game title: Harvest Moon: Save the Homeland
+Game serial: SLUS-20251
+Memory read at 0x00200000: 0x00000000
+```
+
+Exit codes:
+- `0` — Game detected and memory read succeeded
+- `1` — Cannot connect to PCSX2 (PINE IPC not enabled or wrong port)
+- `2` — Connected but wrong game (serial mismatch)
 
 ## Development
 

@@ -10,6 +10,7 @@
 - Add UI design specification. (#8)
 - Build the .NET solution in CI. (#17)
 - Add PINE IPC framing tests. (#19)
+- Add getting-started instructions for the POC. (#16)
 
 ### Changed
 
