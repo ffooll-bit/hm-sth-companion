@@ -11,6 +11,7 @@
 - Build the .NET solution in CI. (#17)
 - Add PINE IPC framing tests. (#19)
 - Add getting-started instructions for the POC. (#16)
+- Document verified EE memory map anchor for TIME and candidate addresses. (#20)
 
 ### Changed
 
