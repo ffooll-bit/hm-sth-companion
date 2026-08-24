@@ -201,3 +201,15 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
+
+### BUG-001 — PINE IPC timeout causes unhandled exception when PCSX2 connected but unresponsive
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-24 14:35
+- **Implemented:** `—`
+- **Problem:** When PCSX2 is running with a game loaded in-game and PINE IPC enabled (TCP 127.0.0.1:28011), the TCP connection succeeds but PCSX2 does not respond to PINE requests within the 5-second read timeout. This throws an unhandled `SocketException` (error code 10060, "connection timed out") wrapped in `IOException` from `NetworkStream.Read()`, which bubbles up as an unhandled exception crash instead of a graceful error message with a distinct exit code. The user sees a stack trace rather than actionable guidance.
+- **Possible Fix:** In `PineClient.ReadExact()` or `PineClient.Request()`, catch `IOException`/`SocketException` where the inner exception is a timeout (SocketErrorCode `TimedOut` / 10060). Throw a custom `PineConnectionException` with a descriptive message: "Connected to PCSX2 but no PINE response received — ensure the game is fully in-game (not paused/menu) and PINE IPC is fully initialized in PCSX2 settings." In `Program.Main()`, catch this exception and return exit code 3 with the friendly message. Keep the existing exit codes: 1 = connection refused, 2 = wrong game serial, 3 = connected but no response.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
