@@ -107,16 +107,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** README.md updated (Requirements + Quick start sections rewritten); docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-006 — Integrate reverse-engineered gameplay memory locations
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #18
 - **Recorded:** 2026-08-23 18:59
-- **Implemented:** `—`
+- **Implemented:** 2026-08-24 13:15
 - **Problem:** The UI design spec renders stamina/money/weather as `--` because gameplay addresses were unknown, but valid Cheat Engine locations against running pcsx2-qt.exe have since been found (base `"pcsx2-qt.exe"+0317C238`): GOLD at offset `864`, STAMINA at `830`, TIME at `5F32F4`. Documented formats: STAMINA is 4 bytes `[maxFatigue, fatigue, maxStamina, stamina]` where max values normally match and shift with Power Berry count (e.g. `8C 00 8C 8C`; normal activity costs -2 stamina, rain -4 and raises fatigue; stamina 0 blocks activities, fatigue at max when YY=XX); TIME is `[season, day, hour, minute]` (e.g. `00 07 06 00`). Weather remains unfound.
 - **Possible Fix:** Document this memory map in its own doc, then add a reading layer that maps the three values into the app. Open items to resolve during implementation: the CE pointers live in host-process address space while PINE reads EE addresses, so choose between direct ReadProcessMemory on the host addresses (the already-planned fallback path) or deriving equivalent EE addresses for PINE; confirm the offset scale anomaly of TIME (`5F32F4` vs short offsets `864`/`830`); locate the weather address.
-- **Actual Fix:** Online verification corroborates without contradicting: Ushi No Tane GS2 codes place day/hour on adjacent addresses (consistent with the contiguous `[season, day, hour, minute]` layout), and NTSC-U Never Tired / Infinite Money cheat listings (IGN, Almar's Guides, supercheats) confirm stamina/gold targets exist in this memory region. The user's live Cheat Engine observations remain primary evidence; final validation happens when the implementation reads live values. Plan unchanged: document the memory map in its own doc, then add a reading layer mapping GOLD/STAMINA/TIME into the app, resolving the three open items (RPM-on-host vs derived EE addresses for PINE, the TIME offset scale anomaly, the missing weather address).
+- **Actual Fix:** Online verification corroborates without contradicting: Ushi No Tane GS2 codes place day/hour on adjacent addresses (consistent with the contiguous `[season, day, hour, minute]` layout), and NTSC-U Never Tired / Infinite Money cheat listings (IGN, Almar's Guides, supercheats) confirm stamina/gold targets exist in this memory region. The user's live Cheat Engine observations remain primary evidence; final validation happens when the implementation reads live values. Resolved: PINE-only path (no RPM fallback for POC); EE TIME anchor `0x002085A2F4` used directly; GOLD derived as STAMINA_EE + 0x34 (GS2/CE delta); STAMINA candidate `0x002085A2E5`; weather returns "Unknown" pending address hunt. Added `GameMemoryReader` with `ReadGold()`, `ReadStamina()`, `ReadTime()`, `ReadWeather()` using `PineClient.ReadU32`; tests via `FakePineServer`; `MEMORY_MAP.md` updated with resolution status.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Created `src/HmSth.Poc/GameMemoryReader.cs` with PINE-only reads for Gold, Stamina, Time, Weather using derived EE addresses from MEMORY_MAP.md; updated `Program.cs` to print all four values after serial verification; added `tests/HmSth.Poc.Tests/GameMemoryReaderTests.cs` with 6 facts covering parsing and error paths; updated `docs/MEMORY_MAP.md` marking items 1, 2, 4 resolved and item 3 (weather) open; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
+- **Changes:** Added src/HmSth.Poc/GameMemoryReader.cs, tests/HmSth.Poc.Tests/GameMemoryReaderTests.cs; modified src/HmSth.Poc/Program.cs, docs/MEMORY_MAP.md; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-007 — PINE framing logic has zero tests
 - **Status:** `implemented`
