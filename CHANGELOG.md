@@ -13,10 +13,12 @@
 - Add getting-started instructions for the POC. (#16)
 - Document verified EE memory map anchor for TIME and candidate addresses. (#20)
 - Add gameplay memory reading layer (Gold, Stamina, Time) via PINE IPC. (#18)
+- Correct gameplay memory read addresses (GOLD/STAMINA/TIME) via verified CE→EE translation. (#41)
 
 ### Changed
 
 - _Behaviour changes, including any migration notes._
+- Remove `[PINE DEBUG]` logging left in `PineClient` from the BUG-002 investigation.
 
 ### Fixed
 

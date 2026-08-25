@@ -251,13 +251,13 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### BUG-003 — Gameplay memory reads (GOLD/TIME/STAMINA) return incorrect values
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #41
 - **Recorded:** 2026-08-25 14:30
-- **Implemented:** `—`
+- **Implemented:** 2026-08-25 21:50
 - **Problem:** `GameMemoryReader` reads derived EE addresses (TIME `0x002085A2F4`, STAMINA `0x002085A2E5`, GOLD `0x002085A319`) but the values do not match the live game. The user's authoritative Cheat Engine addresses are in host process space (`pcsx2-qt.exe`+0317C238 + offsets 864/830/5F32F4) and PINE reads EE RAM — the CE-to-EE translation used is incorrect.
 - **Possible Fix:** Establish the correct CE-host-to-EE mapping (via SaveTheHomelandRandomizer source or live Cheat Engine session), then correct the EE addresses and byte decoding for TIME, STAMINA, GOLD. Note: a CE live session is already planned for ENH-009–013 and can resolve this in parallel.
 - **Actual Fix:** Establish correct CE-host→EE mapping, then correct `GameMemoryReader` addresses + byte decoding. Two paths: (a) derive EE addresses from SaveTheHomelandRandomizer source (primary EE map, GPL-3) for the same game structs; (b) live CE session to locate EE equivalents of `pcsx2-qt.exe`+0317C238+{864,830,5F32F4}. Re-validate TIME decoding (EE dword `[?,?,day,season]` ≠ CE `[SS,DD,HH,MM]`). Resolvable alongside the ENH-009–013 CE hunt.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Hardcoded ground-truth EE addresses in `GameMemoryReader` (GOLD `0x20267864`, STAMINA `0x20267830`, TIME `0x2085A2F4`), resolved via the CE→EE translation (`EEmem` base `0x7FF740000000`). The existing `StaminaReading`/`TimeReading` byte decode was already correct (MSB-first: `max_fatigue`/`season` = MSB … `stamina`/`minute` = LSB) and was kept unchanged. Removed the guessed `WeatherAddress`/`DecodeWeather`; `ReadWeather` returns `"Unknown"`.
+- **Changes:** Gameplay reads now return correct in-game GOLD, STAMINA, and TIME via PINE IPC (no RPM). Previously read derived/guessed EE addresses (correct decode, wrong locations) and returned garbage; the corrected addresses match the user's Cheat Engine layout. Weather stays `"Unknown"` pending the ENH-009 CE hunt.

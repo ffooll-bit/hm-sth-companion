@@ -66,15 +66,14 @@ public sealed class GameMemoryReader
 {
     private readonly PineClient _pine;
 
-    // EE addresses from MEMORY_MAP.md
-    // TIME anchor verified: 0x002085A2F4
-    // STAMINA candidate region: 0x2085A2E2-E8 (using midpoint 0x2085A2E5 for POC)
-    // GOLD = STAMINA + 0x34 (GS2/CE delta correlation)
-    // Weather hunt start: 0x2085A2E2
-    private const uint TimeAddress = 0x002085A2F4;
-    private const uint StaminaAddress = 0x002085A2E5;
-    private const uint GoldAddress = StaminaAddress + 0x34;
-    private const uint WeatherAddress = 0x002085A2E2;
+    // EE addresses resolved via CE->EE translation: PINE_EE = 0x20000000 + (ResolvedHost - EEmemBase).
+    // EEmem base (host) = 0x7FF740000000, found via Cheat Engine Lua Engine; matches the user's CE base
+    // pointer pcsx2-qt.exe+0317C238 + offsets 864/830/5F32F4. Addresses are reboot-stable (EE space
+    // does not shift with Windows ASLR). GOLD - STAMINA = 0x34 matches the CE layout.
+    private const uint TimeAddress = 0x2085A2F4;
+    private const uint StaminaAddress = 0x20267830;
+    private const uint GoldAddress = 0x20267864;
+    // Weather address not yet located (CE hunt pending, see ENH-009). ReadWeather returns Unknown.
 
     public GameMemoryReader(PineClient pine) => _pine = pine;
 
@@ -84,25 +83,5 @@ public sealed class GameMemoryReader
 
     public TimeReading ReadTime() => new(_pine.ReadU32(TimeAddress));
 
-    public WeatherReading ReadWeather()
-    {
-        try
-        {
-            uint raw = _pine.ReadU32(WeatherAddress);
-            return new WeatherReading(DecodeWeather(raw));
-        }
-        catch
-        {
-            return new WeatherReading("Unknown (address not yet located)");
-        }
-    }
-
-    private static string DecodeWeather(uint raw)
-    {
-        byte b0 = (byte)(raw >> 24);
-        byte b1 = (byte)(raw >> 16);
-        byte b2 = (byte)(raw >> 8);
-        byte b3 = (byte)raw;
-        return $"Raw 0x{raw:X8} (bytes {b0:X2} {b1:X2} {b2:X2} {b3:X2})";
-    }
+    public WeatherReading ReadWeather() => new("Unknown (address not yet located)");
 }

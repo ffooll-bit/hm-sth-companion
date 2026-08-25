@@ -88,16 +88,4 @@ public class GameMemoryReaderTests : IDisposable
         Assert.Equal("Unknown (address not yet located)", weather.Description);
     }
 
-    [Fact]
-    public void ReadWeather_ReturnsRawDecodedValue()
-    {
-        uint raw = 0x01020304;
-        byte[] payload = new byte[4];
-        BinaryPrimitives.WriteUInt32LittleEndian(payload, raw);
-        _server.ServeOne(_ => FakePineServer.Ok(payload));
-
-        WeatherReading weather = _reader.ReadWeather();
-
-        Assert.Equal("Raw 0x01020304 (bytes 01 02 03 04)", weather.Description);
-    }
 }
