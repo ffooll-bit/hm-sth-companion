@@ -2,6 +2,7 @@ using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace HmSth.Poc.Tests;
 
@@ -79,6 +80,28 @@ internal sealed class FakePineServer : IDisposable
 
             byte[] reply = replyFactory(request);
             socket.Send(reply);
+        });
+    }
+
+    // Simulates a server that accepts connection but never responds (causes client read timeout)
+    public void ServeOneTimeout()
+    {
+        _exchange = Task.Run(() =>
+        {
+            using Socket socket = _listener.AcceptSocket();
+
+            byte[] head = new byte[3];
+            ReadExact(socket, head);
+
+            int requestSize = head[0] | (head[1] << 8);
+
+            if (requestSize > 3)
+            {
+                ReadExact(socket, new byte[requestSize - 3]);
+            }
+
+            // Never send response, never close - let client timeout
+            Thread.Sleep(Timeout.Infinite);
         });
     }
 

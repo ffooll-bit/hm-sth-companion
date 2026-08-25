@@ -21,5 +21,6 @@
 ### Fixed
 
 - _Bug fixes, one line each, referencing the issue if applicable._
+- Fix PINE IPC read timeout handling: graceful error message and exit code 3 when PCSX2 connected but unresponsive. (#33)
 
 [Unreleased]: https://github.com/ffooll-bit/hm-sth-companion/compare/v0.1.0...HEAD
