@@ -225,3 +225,39 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** (1) Separate timeouts: `ReadMetadataTimeoutMs = 15000`, `ReadGameplayTimeoutMs = 5000`; per-request timeout in `ReadString()`/`ReadU32()` with `finally` restore. (2) Protocol fixed to 4-byte size header (u32 LE) + 1-byte opcode/resultCode; updated `FakePineServer` and all 20 tests to match pine-client protocol. (3) Debug logging added (toggleable via `DebugLog` constant). Verified working with PCSX2 v2.6.3.
 - **Changes:** `src/HmSth.Poc/PineClient.cs`, `tests/HmSth.Poc.Tests/FakePineServer.cs`, `tests/HmSth.Poc.Tests/PineClientTests.cs`
+
+### ENH-014 — Build the WinForms companion application
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-25 14:30
+- **Implemented:** `—`
+- **Problem:** The POC console app proves the data path (PINE IPC → GameMemoryReader), but there is no shell application that renders the HUD specified in `docs/UI_DESIGN_SPEC.md`.
+- **Possible Fix:** Create `src/HmSth.App` (net8.0 WinForms) referencing `PineClient` and `GameMemoryReader` via project reference; implement the three application states (Disconnected / Wrong game / Playing), the two-column layout (Game HUD + Memory Monitor, full-width Guide), and the custom dark theme palette copied from the social preview.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### DOC-002 — Two Magic Context documents untracked need a track/ignore decision
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-25 14:30
+- **Implemented:** `—`
+- **Problem:** `ARCHITECTURE.md` and `STRUCTURE.md` were created by Magic Context and remain untracked. A decision is needed: commit them to the repository (and maintain them) or ignore them via `.gitignore`.
+- **Possible Fix:** Add both to `.gitignore` (they are session artifacts, not project deliverables) to keep `git status` clean. Alternative: track them and align with repo conventions.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### BUG-003 — Gameplay memory reads (GOLD/TIME/STAMINA) return incorrect values
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-25 14:30
+- **Implemented:** `—`
+- **Problem:** `GameMemoryReader` reads derived EE addresses (TIME `0x002085A2F4`, STAMINA `0x002085A2E5`, GOLD `0x002085A319`) but the values do not match the live game. The user's authoritative Cheat Engine addresses are in host process space (`pcsx2-qt.exe`+0317C238 + offsets 864/830/5F32F4) and PINE reads EE RAM — the CE-to-EE translation used is incorrect.
+- **Possible Fix:** Establish the correct CE-host-to-EE mapping (via SaveTheHomelandRandomizer source or live Cheat Engine session), then correct the EE addresses and byte decoding for TIME, STAMINA, GOLD. Note: a CE live session is already planned for ENH-009–013 and can resolve this in parallel.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
