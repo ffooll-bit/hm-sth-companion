@@ -23,6 +23,14 @@ public sealed class PineClient : IDisposable
     private const int ReadMetadataTimeoutMs = 15000;
     private const int ReadGameplayTimeoutMs = 5000;
 
+    private const bool DebugLog = true;
+
+    private static void LogDebug(string message)
+    {
+        if (DebugLog)
+            Console.Error.WriteLine($"[PINE DEBUG] {DateTime.Now:HH:mm:ss.fff} {message}");
+    }
+
     private readonly string _host;
     private readonly int _port;
     private TcpClient? _tcp;
@@ -101,37 +109,55 @@ public sealed class PineClient : IDisposable
     private byte[] Request(byte opcode, uint address = 0)
     {
         bool carriesAddress = opcode == PineCommand.Read32;
-        byte[] packet = carriesAddress ? new byte[7] : new byte[3];
+        int bodyLength = carriesAddress ? 4 : 0;
+        int packetSize = 5 + bodyLength; // 4 bytes size + 1 opcode + body
+        byte[] packet = new byte[packetSize];
 
-        packet[0] = (byte)packet.Length;
-        packet[1] = (byte)(packet.Length >> 8);
-        packet[2] = opcode;
+        // 4-byte size header (u32 LE)
+        byte[] sizeBytes = BitConverter.GetBytes((uint)packetSize);
+        sizeBytes.CopyTo(packet, 0);
+
+        // 1-byte opcode
+        packet[4] = opcode;
 
         if (carriesAddress)
         {
-            BitConverter.GetBytes(address).CopyTo(packet, 3);
+            BitConverter.GetBytes(address).CopyTo(packet, 5);
         }
 
         NetworkStream stream = _tcp!.GetStream();
         stream.Write(packet, 0, packet.Length);
 
-        byte[] header = ReadExact(stream, 2);
-        int responseSize = header[0] | (header[1] << 8);
+        LogDebug($"TX: {BitConverter.ToString(packet).Replace("-", " ")}");
 
-        if (responseSize < 6)
+        // Response header: 5 bytes (4 size + 1 result code)
+        byte[] header = ReadExact(stream, 5);
+        int responseSize = header[0] | (header[1] << 8) | (header[2] << 16) | (header[3] << 24);
+        byte resultCode = header[4];
+
+        LogDebug($"RX header: {BitConverter.ToString(header).Replace("-", " ")} (size={responseSize}, resultCode={resultCode})");
+
+        if (responseSize < 5)
         {
             throw new IOException($"Invalid response size {responseSize} for command 0x{opcode:X2}.");
         }
 
-        byte[] rest = ReadExact(stream, responseSize - 2);
-        int result = BitConverter.ToInt32(rest, 0);
-
-        if (result != 0)
+        if (resultCode == 0xFF)
         {
-            throw new IOException($"Command 0x{opcode:X2} failed with PINE result code {result}.");
+            throw new IOException($"Command 0x{opcode:X2} failed with PINE result code 255.");
         }
 
-        return rest[4..];
+        if (resultCode != 0)
+        {
+            throw new IOException($"Command 0x{opcode:X2} failed with PINE result code {resultCode}.");
+        }
+
+        byte[] rest = ReadExact(stream, responseSize - 5);
+
+        LogDebug($"RX body: {BitConverter.ToString(rest).Replace("-", " ")}");
+
+        // Response body starts after 5-byte header (4 size + 1 result code)
+        return rest;
     }
 
     private static byte[] ReadExact(Stream stream, int count)

@@ -18,7 +18,7 @@ public class PineClientTests : IDisposable
     public void Dispose() => _client.Dispose();
 
     [Fact]
-    public void ReadU32_SendsSevenByteFramedRequestAndParsesValue()
+    public void ReadU32_SendsNineByteFramedRequestAndParsesValue()
     {
         byte[]? captured = null;
         _server.ServeOne(request =>
@@ -31,14 +31,14 @@ public class PineClientTests : IDisposable
 
         Assert.Equal(1337u, value);
         Assert.NotNull(captured);
-        Assert.Equal(7, captured.Length);
-        Assert.Equal(7, captured[0] | (captured[1] << 8));
-        Assert.Equal(PineCommand.Read32, captured[2]);
-        Assert.Equal(0x00200000u, BinaryPrimitives.ReadUInt32LittleEndian(captured.AsSpan(3)));
+        Assert.Equal(9, (int)captured.Length);
+        Assert.Equal(9u, BinaryPrimitives.ReadUInt32LittleEndian(captured.AsSpan(0)));
+        Assert.Equal(PineCommand.Read32, captured[4]);
+        Assert.Equal(0x00200000u, BinaryPrimitives.ReadUInt32LittleEndian(captured.AsSpan(5)));
     }
 
     [Fact]
-    public void ReadString_MetadataOpcode_SendsThreeByteRequest()
+    public void ReadString_MetadataOpcode_SendsFiveByteRequest()
     {
         byte[]? captured = null;
         _server.ServeOne(request =>
@@ -51,8 +51,9 @@ public class PineClientTests : IDisposable
 
         Assert.Equal("PCSX2 2.3.123", version);
         Assert.NotNull(captured);
-        Assert.Equal(3, captured.Length);
-        Assert.Equal(PineCommand.Version, captured[2]);
+        Assert.Equal(5, (int)captured.Length);
+        Assert.Equal(5u, BinaryPrimitives.ReadUInt32LittleEndian(captured.AsSpan(0)));
+        Assert.Equal(PineCommand.Version, captured[4]);
     }
 
     [Fact]
@@ -66,10 +67,10 @@ public class PineClientTests : IDisposable
     }
 
     [Theory]
-    [InlineData(new byte[] { 0x05, 0x00 })]
-    [InlineData(new byte[] { 0x00, 0x00 })]
-    [InlineData(new byte[] { 0x01, 0x00 })]
-    public void ResponseSize_BelowSix_Throws(byte[] header)
+    [InlineData(new byte[] { 0x03, 0x00, 0x00, 0x00, 0x00 })]
+    [InlineData(new byte[] { 0x04, 0x00, 0x00, 0x00, 0x00 })]
+    [InlineData(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00 })]
+    public void ResponseSize_BelowFive_Throws(byte[] header)
     {
         _server.ServeOne(_ => header);
 
@@ -101,8 +102,11 @@ public class PineClientTests : IDisposable
     {
         _server.ServeOne(_ =>
         {
-            byte[] partial = new byte[8];
-            BinaryPrimitives.WriteUInt16LittleEndian(partial, 10);
+            // Old format: 2-byte size + 1 opcode + partial body
+            // New format: 4-byte size + 1 result code = 5 bytes header minimum
+            byte[] partial = new byte[5];
+            BinaryPrimitives.WriteUInt32LittleEndian(partial, 10);
+            partial[4] = 0;
             return partial;
         });
 
