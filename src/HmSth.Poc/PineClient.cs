@@ -20,7 +20,8 @@ public sealed class PineConnectionException : Exception
 // ponytail: strict serial request/reply - PCSX2 silently drops replies beyond ~7 in-flight requests
 public sealed class PineClient : IDisposable
 {
-    private const int ReadTimeoutMs = 5000;
+    private const int ReadMetadataTimeoutMs = 15000;
+    private const int ReadGameplayTimeoutMs = 5000;
 
     private readonly string _host;
     private readonly int _port;
@@ -36,45 +37,65 @@ public sealed class PineClient : IDisposable
     {
         _tcp = new TcpClient();
         _tcp.Connect(_host, _port);
-        _tcp.GetStream().ReadTimeout = ReadTimeoutMs;
+        _tcp.GetStream().ReadTimeout = ReadGameplayTimeoutMs;
     }
 
     public string ReadString(byte opcode)
     {
-        byte[] data = Request(opcode);
-
-        if (data.Length < 4)
+        var stream = _tcp!.GetStream();
+        var originalTimeout = stream.ReadTimeout;
+        try
         {
-            throw new IOException($"Truncated string payload for command 0x{opcode:X2}.");
+            stream.ReadTimeout = ReadMetadataTimeoutMs;
+            byte[] data = Request(opcode);
+
+            if (data.Length < 4)
+            {
+                throw new IOException($"Truncated string payload for command 0x{opcode:X2}.");
+            }
+
+            uint lengthIncludingTerminator = BitConverter.ToUInt32(data, 0);
+
+            if (lengthIncludingTerminator == 0 || data.Length < 4 + lengthIncludingTerminator)
+            {
+                throw new IOException($"Malformed string payload for command 0x{opcode:X2}.");
+            }
+
+            int end = 4 + (int)lengthIncludingTerminator;
+
+            if (data[end - 1] != 0)
+            {
+                throw new IOException($"Missing null terminator for command 0x{opcode:X2}.");
+            }
+
+            return Encoding.UTF8.GetString(data, 4, end - 5);
         }
-
-        uint lengthIncludingTerminator = BitConverter.ToUInt32(data, 0);
-
-        if (lengthIncludingTerminator == 0 || data.Length < 4 + lengthIncludingTerminator)
+        finally
         {
-            throw new IOException($"Malformed string payload for command 0x{opcode:X2}.");
+            stream.ReadTimeout = originalTimeout;
         }
-
-        int end = 4 + (int)lengthIncludingTerminator;
-
-        if (data[end - 1] != 0)
-        {
-            throw new IOException($"Missing null terminator for command 0x{opcode:X2}.");
-        }
-
-        return Encoding.UTF8.GetString(data, 4, end - 5);
     }
 
     public uint ReadU32(uint address)
     {
-        byte[] data = Request(PineCommand.Read32, address);
-
-        if (data.Length < 4)
+        var stream = _tcp!.GetStream();
+        var originalTimeout = stream.ReadTimeout;
+        try
         {
-            throw new IOException($"Truncated read payload for address 0x{address:X8}.");
-        }
+            stream.ReadTimeout = ReadGameplayTimeoutMs;
+            byte[] data = Request(PineCommand.Read32, address);
 
-        return BitConverter.ToUInt32(data, 0);
+            if (data.Length < 4)
+            {
+                throw new IOException($"Truncated read payload for address 0x{address:X8}.");
+            }
+
+            return BitConverter.ToUInt32(data, 0);
+        }
+        finally
+        {
+            stream.ReadTimeout = originalTimeout;
+        }
     }
 
     private byte[] Request(byte opcode, uint address = 0)

@@ -22,5 +22,6 @@
 
 - _Bug fixes, one line each, referencing the issue if applicable._
 - Fix PINE IPC read timeout handling: graceful error message and exit code 3 when PCSX2 connected but unresponsive. (#33)
+- Fix PINE IPC read timeout too aggressive for metadata requests: separate 15s timeout for metadata (Version/Id/Title) and 5s for gameplay reads. (#36)
 
 [Unreleased]: https://github.com/ffooll-bit/hm-sth-companion/compare/v0.1.0...HEAD
