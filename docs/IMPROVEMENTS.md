@@ -227,37 +227,37 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `src/HmSth.Poc/PineClient.cs`, `tests/HmSth.Poc.Tests/FakePineServer.cs`, `tests/HmSth.Poc.Tests/PineClientTests.cs`
 
 ### ENH-014 — Build the WinForms companion application
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-25 14:30
 - **Implemented:** `—`
 - **Problem:** The POC console app proves the data path (PINE IPC → GameMemoryReader), but there is no shell application that renders the HUD specified in `docs/UI_DESIGN_SPEC.md`.
 - **Possible Fix:** Create `src/HmSth.App` (net8.0 WinForms) referencing `PineClient` and `GameMemoryReader` via project reference; implement the three application states (Disconnected / Wrong game / Playing), the two-column layout (Game HUD + Memory Monitor, full-width Guide), and the custom dark theme palette copied from the social preview.
-- **Actual Fix:** `—`
+- **Actual Fix:** Create `src/HmSth.App` (net8.0 WinForms), `ProjectReference` to `HmSth.Poc`, render 3 states (Disconnected / Wrong game / Playing) + 2-column HUD/Memory Monitor layout + custom dark theme from `docs/UI_DESIGN_SPEC.md`; add to `HmSth.sln`.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### DOC-002 — Two Magic Context documents untracked need a track/ignore decision
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-25 14:30
 - **Implemented:** `—`
 - **Problem:** `ARCHITECTURE.md` and `STRUCTURE.md` were created by Magic Context and remain untracked. A decision is needed: commit them to the repository (and maintain them) or ignore them via `.gitignore`.
 - **Possible Fix:** Add both to `.gitignore` (they are session artifacts, not project deliverables) to keep `git status` clean. Alternative: track them and align with repo conventions.
-- **Actual Fix:** `—`
+- **Actual Fix:** Add `ARCHITECTURE.md` and `STRUCTURE.md` to `.gitignore` under an "AI/session artifacts" section (mirrors ENH-004's `.cortexkit/` entry) — they are session-generated, not project deliverables.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### BUG-003 — Gameplay memory reads (GOLD/TIME/STAMINA) return incorrect values
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-08-25 14:30
 - **Implemented:** `—`
 - **Problem:** `GameMemoryReader` reads derived EE addresses (TIME `0x002085A2F4`, STAMINA `0x002085A2E5`, GOLD `0x002085A319`) but the values do not match the live game. The user's authoritative Cheat Engine addresses are in host process space (`pcsx2-qt.exe`+0317C238 + offsets 864/830/5F32F4) and PINE reads EE RAM — the CE-to-EE translation used is incorrect.
 - **Possible Fix:** Establish the correct CE-host-to-EE mapping (via SaveTheHomelandRandomizer source or live Cheat Engine session), then correct the EE addresses and byte decoding for TIME, STAMINA, GOLD. Note: a CE live session is already planned for ENH-009–013 and can resolve this in parallel.
-- **Actual Fix:** `—`
+- **Actual Fix:** Establish correct CE-host→EE mapping, then correct `GameMemoryReader` addresses + byte decoding. Two paths: (a) derive EE addresses from SaveTheHomelandRandomizer source (primary EE map, GPL-3) for the same game structs; (b) live CE session to locate EE equivalents of `pcsx2-qt.exe`+0317C238+{864,830,5F32F4}. Re-validate TIME decoding (EE dword `[?,?,day,season]` ≠ CE `[SS,DD,HH,MM]`). Resolvable alongside the ENH-009–013 CE hunt.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
