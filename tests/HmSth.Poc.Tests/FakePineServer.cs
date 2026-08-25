@@ -21,12 +21,16 @@ internal sealed class FakePineServer : IDisposable
 
     public int Port { get; }
 
+    // New protocol: 4-byte size (u32 LE) + 1-byte result code + payload
     public static byte[] Ok(byte[] payload)
     {
-        byte[] response = new byte[6 + payload.Length];
-        BinaryPrimitives.WriteUInt16LittleEndian(response, (ushort)response.Length);
-        BinaryPrimitives.WriteInt32LittleEndian(response.AsSpan(2), 0);
-        payload.CopyTo(response, 6);
+        int bodyLength = 1 + payload.Length; // 1 byte result code + payload
+        int packetSize = 5 + bodyLength; // 4 bytes size + bodyLength
+        byte[] response = new byte[packetSize];
+
+        BinaryPrimitives.WriteUInt32LittleEndian(response, (uint)packetSize);
+        response[4] = 0; // result code 0 = success
+        payload.CopyTo(response, 5);
         return response;
     }
 
@@ -36,14 +40,16 @@ internal sealed class FakePineServer : IDisposable
         byte[] payload = new byte[4 + text.Length + 1];
         BinaryPrimitives.WriteUInt32LittleEndian(payload, (uint)(text.Length + 1));
         text.CopyTo(payload, 4);
+        payload[payload.Length - 1] = 0; // null terminator
         return Ok(payload);
     }
 
     public static byte[] Error(int resultCode)
     {
-        byte[] response = new byte[6];
-        BinaryPrimitives.WriteUInt16LittleEndian(response, 6);
-        BinaryPrimitives.WriteInt32LittleEndian(response.AsSpan(2), resultCode);
+        int packetSize = 6; // 4 bytes size + 1 result code + 0 payload
+        byte[] response = new byte[packetSize];
+        BinaryPrimitives.WriteUInt32LittleEndian(response, (uint)packetSize);
+        response[4] = (byte)resultCode;
         return response;
     }
 
@@ -53,16 +59,18 @@ internal sealed class FakePineServer : IDisposable
         {
             using Socket socket = _listener.AcceptSocket();
 
-            byte[] head = new byte[3];
+            // Read request: 4-byte size + 1 opcode + optional address
+            byte[] head = new byte[5];
             ReadExact(socket, head);
 
-            int requestSize = head[0] | (head[1] << 8);
+            int requestSize = (int)BinaryPrimitives.ReadUInt32LittleEndian(head);
+            byte opcode = head[4];
 
             if (replyFactory is null)
             {
-                if (requestSize > 3)
+                if (requestSize > 5)
                 {
-                    ReadExact(socket, new byte[requestSize - 3]);
+                    ReadExact(socket, new byte[requestSize - 5]);
                 }
 
                 socket.Shutdown(SocketShutdown.Both);
@@ -71,11 +79,11 @@ internal sealed class FakePineServer : IDisposable
 
             byte[] request = head;
 
-            if (requestSize > 3)
+            if (requestSize > 5)
             {
                 request = new byte[requestSize];
                 head.CopyTo(request, 0);
-                ReadExact(socket, request.AsSpan(3));
+                ReadExact(socket, request.AsSpan(5));
             }
 
             byte[] reply = replyFactory(request);
@@ -90,14 +98,14 @@ internal sealed class FakePineServer : IDisposable
         {
             using Socket socket = _listener.AcceptSocket();
 
-            byte[] head = new byte[3];
+            byte[] head = new byte[5];
             ReadExact(socket, head);
 
-            int requestSize = head[0] | (head[1] << 8);
+            int requestSize = (int)BinaryPrimitives.ReadUInt32LittleEndian(head);
 
-            if (requestSize > 3)
+            if (requestSize > 5)
             {
-                ReadExact(socket, new byte[requestSize - 3]);
+                ReadExact(socket, new byte[requestSize - 5]);
             }
 
             // Never send response, never close - let client timeout

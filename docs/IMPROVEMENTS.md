@@ -218,10 +218,10 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Status:** `implemented`
 - **Issue:** #36
 - **Recorded:** 2026-08-24 16:30
-- **Implemented:** 2026-08-24 18:30
+- **Implemented:** 2026-08-24 19:15
 - **Problem:** The 5-second read timeout (`ReadTimeoutMs = 5000`) triggers on initial metadata requests (Version, Title, Id) after game load because PINE IPC takes longer than 5s to initialize and respond. Users see "Connected to PCSX2 but no PINE response received..." even with correct game loaded and IPC enabled — it's a false positive timeout, not an actual connection failure.
 - **Possible Fix:** Increase read timeout for metadata phase to 15000-30000ms (PINE IPC startup latency), optionally with 1 retry on timeout. Options: (1) Global timeout increase to 15000ms; (2) Separate timeouts: 15s for metadata reads (ReadString), 5s for gameplay reads (ReadU32); (3) Retry logic: on timeout, wait 1s and retry once before giving up.
-- **Actual Fix:** Implement separate timeouts: 15s for metadata reads (`ReadString`), 5s for gameplay reads (`ReadU32`). Modify `ReadString()` and `ReadU32()` to set `stream.ReadTimeout` per-request type (metadata vs gameplay), then restore original timeout in `finally` block. `ReadExact()` uses the already-set stream timeout (no logic change needed). Files: `src/HmSth.Poc/PineClient.cs`.
+- **Actual Fix:** Implement separate timeouts: 15s for metadata reads (`ReadString`), 5s for gameplay reads (`ReadU32`). Modify `ReadString()` and `ReadU32()` to set `stream.ReadTimeout` per-request type (metadata vs gameplay), then restore original timeout in `finally` block. `ReadExact()` uses the already-set stream timeout (no logic change needed). Additionally fixed protocol mismatch: PCSX2 v2.6.3 expects 4-byte size header (u32 LE) + 1-byte opcode/resultCode; updated request/response framing and `FakePineServer`/tests to match pine-client protocol.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** Added `ReadMetadataTimeoutMs = 15000` and `ReadGameplayTimeoutMs = 5000` constants; `Connect()` defaults to gameplay timeout; `ReadString()` sets 15s timeout for metadata requests (Version/Id/Title) and restores in `finally`; `ReadU32()` sets 5s timeout for gameplay reads and restores in `finally`; `ReadExact()` unchanged (uses stream's current timeout). All 20 tests pass.
-- **Changes:** `src/HmSth.Poc/PineClient.cs`
+- **Actual Implemented:** (1) Separate timeouts: `ReadMetadataTimeoutMs = 15000`, `ReadGameplayTimeoutMs = 5000`; per-request timeout in `ReadString()`/`ReadU32()` with `finally` restore. (2) Protocol fixed to 4-byte size header (u32 LE) + 1-byte opcode/resultCode; updated `FakePineServer` and all 20 tests to match pine-client protocol. (3) Debug logging added (toggleable via `DebugLog` constant). Verified working with PCSX2 v2.6.3.
+- **Changes:** `src/HmSth.Poc/PineClient.cs`, `tests/HmSth.Poc.Tests/FakePineServer.cs`, `tests/HmSth.Poc.Tests/PineClientTests.cs`
