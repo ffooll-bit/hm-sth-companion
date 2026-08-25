@@ -23,14 +23,6 @@ public sealed class PineClient : IDisposable
     private const int ReadMetadataTimeoutMs = 15000;
     private const int ReadGameplayTimeoutMs = 5000;
 
-    private const bool DebugLog = true;
-
-    private static void LogDebug(string message)
-    {
-        if (DebugLog)
-            Console.Error.WriteLine($"[PINE DEBUG] {DateTime.Now:HH:mm:ss.fff} {message}");
-    }
-
     private readonly string _host;
     private readonly int _port;
     private TcpClient? _tcp;
@@ -128,14 +120,10 @@ public sealed class PineClient : IDisposable
         NetworkStream stream = _tcp!.GetStream();
         stream.Write(packet, 0, packet.Length);
 
-        LogDebug($"TX: {BitConverter.ToString(packet).Replace("-", " ")}");
-
         // Response header: 5 bytes (4 size + 1 result code)
         byte[] header = ReadExact(stream, 5);
         int responseSize = header[0] | (header[1] << 8) | (header[2] << 16) | (header[3] << 24);
         byte resultCode = header[4];
-
-        LogDebug($"RX header: {BitConverter.ToString(header).Replace("-", " ")} (size={responseSize}, resultCode={resultCode})");
 
         if (responseSize < 5)
         {
@@ -153,8 +141,6 @@ public sealed class PineClient : IDisposable
         }
 
         byte[] rest = ReadExact(stream, responseSize - 5);
-
-        LogDebug($"RX body: {BitConverter.ToString(rest).Replace("-", " ")}");
 
         // Response body starts after 5-byte header (4 size + 1 result code)
         return rest;
