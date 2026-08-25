@@ -213,3 +213,15 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** Added `PineConnectionException` class; modified `ReadExact()` to catch `SocketException.TimedOut` and wrap in `PineConnectionException`; modified `Program.Main()` to catch `PineConnectionException` and return exit code 3; added `FakePineServer.ServeOneTimeout()` for test simulation; added test `ReadString_Timeout_ThrowsPineConnectionException`. Updated IMPROVEMENTS.md BUG-001 to implemented; CHANGELOG.md gains release note under [Unreleased].
 - **Changes:** `src/HmSth.Poc/PineClient.cs`, `src/HmSth.Poc/Program.cs`, `tests/HmSth.Poc.Tests/PineClientTests.cs`, `tests/HmSth.Poc.Tests/FakePineServer.cs`
+
+### BUG-002 — PINE IPC read timeout too aggressive for initial metadata requests
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-24 16:30
+- **Implemented:** `—`
+- **Problem:** The 5-second read timeout (`ReadTimeoutMs = 5000`) triggers on initial metadata requests (Version, Title, Id) after game load because PINE IPC takes longer than 5s to initialize and respond. Users see "Connected to PCSX2 but no PINE response received..." even with correct game loaded and IPC enabled — it's a false positive timeout, not an actual connection failure.
+- **Possible Fix:** Increase read timeout for metadata phase to 15000-30000ms (PINE IPC startup latency), optionally with 1 retry on timeout. Options: (1) Global timeout increase to 15000ms; (2) Separate timeouts: 15s for metadata reads (ReadString), 5s for gameplay reads (ReadU32); (3) Retry logic: on timeout, wait 1s and retry once before giving up.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
