@@ -203,13 +203,13 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### BUG-001 — PINE IPC timeout causes unhandled exception when PCSX2 connected but unresponsive
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #33
 - **Recorded:** 2026-08-24 14:35
-- **Implemented:** `—`
+- **Implemented:** 2026-08-24 15:45
 - **Problem:** When PCSX2 is running with a game loaded in-game and PINE IPC enabled (TCP 127.0.0.1:28011), the TCP connection succeeds but PCSX2 does not respond to PINE requests within the 5-second read timeout. This throws an unhandled `SocketException` (error code 10060, "connection timed out") wrapped in `IOException` from `NetworkStream.Read()`, which bubbles up as an unhandled exception crash instead of a graceful error message with a distinct exit code. The user sees a stack trace rather than actionable guidance.
 - **Possible Fix:** In `PineClient.ReadExact()` or `PineClient.Request()`, catch `IOException`/`SocketException` where the inner exception is a timeout (SocketErrorCode `TimedOut` / 10060). Throw a custom `PineConnectionException` with a descriptive message: "Connected to PCSX2 but no PINE response received — ensure the game is fully in-game (not paused/menu) and PINE IPC is fully initialized in PCSX2 settings." In `Program.Main()`, catch this exception and return exit code 3 with the friendly message. Keep the existing exit codes: 1 = connection refused, 2 = wrong game serial, 3 = connected but no response.
-- **Actual Fix:** Catch `IOException`/`SocketException` timeout in `PineClient.ReadExact()`, throw custom `PineConnectionException` with actionable message. In `Program.Main()`, catch this exception and return exit code 3. Files: `src/HmSth.Poc/PineClient.cs` (add custom exception + catch in ReadExact), `src/HmSth.Poc/Program.cs` (add catch for exit code 3).
+- **Actual Fix:** Catch `IOException`/`SocketException` timeout in `PineClient.ReadExact()`, throw custom `PineConnectionException` with actionable message. In `Program.Main()`, catch this exception and return exit code 3. Added test for timeout scenario via `FakePineServer.ServeOneTimeout()`. Files: `src/HmSth.Poc/PineClient.cs` (add custom exception + catch in ReadExact), `src/HmSth.Poc/Program.cs` (add catch for exit code 3), `tests/HmSth.Poc.Tests/PineClientTests.cs` (timeout test), `tests/HmSth.Poc.Tests/FakePineServer.cs` (timeout simulation).
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `src/HmSth.Poc/PineClient.cs`, `src/HmSth.Poc/Program.cs`
+- **Actual Implemented:** Added `PineConnectionException` class; modified `ReadExact()` to catch `SocketException.TimedOut` and wrap in `PineConnectionException`; modified `Program.Main()` to catch `PineConnectionException` and return exit code 3; added `FakePineServer.ServeOneTimeout()` for test simulation; added test `ReadString_Timeout_ThrowsPineConnectionException`. Updated IMPROVEMENTS.md BUG-001 to implemented; CHANGELOG.md gains release note under [Unreleased].
+- **Changes:** `src/HmSth.Poc/PineClient.cs`, `src/HmSth.Poc/Program.cs`, `tests/HmSth.Poc.Tests/PineClientTests.cs`, `tests/HmSth.Poc.Tests/FakePineServer.cs`

@@ -25,10 +25,23 @@ internal static class Program
             return 1;
         }
 
-        string version = pine.ReadString(PineCommand.Version);
-        string serial = pine.ReadString(PineCommand.Id);
-        string title = pine.ReadString(PineCommand.Title);
-        uint value = pine.ReadU32(DemoAddress);
+        string version;
+        string serial;
+        string title;
+        uint value;
+
+        try
+        {
+            version = pine.ReadString(PineCommand.Version);
+            serial = pine.ReadString(PineCommand.Id);
+            title = pine.ReadString(PineCommand.Title);
+            value = pine.ReadU32(DemoAddress);
+        }
+        catch (PineConnectionException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            return 3;
+        }
 
         Console.WriteLine($"Emulator : {version}");
         Console.WriteLine($"Title    : {title}");

@@ -158,4 +158,15 @@ public class PineClientTests : IDisposable
 
         Assert.Contains("Truncated read payload", failure.Message);
     }
+
+    [Fact]
+    public void ReadString_Timeout_ThrowsPineConnectionException()
+    {
+        _server.ServeOneTimeout();
+
+        var exception = Assert.Throws<PineConnectionException>(() => _client.ReadString(PineCommand.Version));
+
+        Assert.Contains("no PINE response received", exception.Message);
+        Assert.Contains("fully in-game", exception.Message);
+    }
 }

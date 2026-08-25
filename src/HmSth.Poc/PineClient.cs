@@ -11,6 +11,12 @@ public static class PineCommand
     public const byte Id = 0x0C;
 }
 
+public sealed class PineConnectionException : Exception
+{
+    public PineConnectionException(string message) : base(message) { }
+    public PineConnectionException(string message, Exception inner) : base(message, inner) { }
+}
+
 // ponytail: strict serial request/reply - PCSX2 silently drops replies beyond ~7 in-flight requests
 public sealed class PineClient : IDisposable
 {
@@ -114,14 +120,23 @@ public sealed class PineClient : IDisposable
 
         while (offset < count)
         {
-            int read = stream.Read(buffer, offset, count - offset);
-
-            if (read <= 0)
+            try
             {
-                throw new EndOfStreamException("Connection closed by PCSX2.");
-            }
+                int read = stream.Read(buffer, offset, count - offset);
 
-            offset += read;
+                if (read <= 0)
+                {
+                    throw new EndOfStreamException("Connection closed by PCSX2.");
+                }
+
+                offset += read;
+            }
+            catch (IOException ex) when (ex.InnerException is SocketException { SocketErrorCode: SocketError.TimedOut })
+            {
+                throw new PineConnectionException(
+                    "Connected to PCSX2 but no PINE response received — ensure the game is fully in-game (not paused/menu) and PINE IPC is fully initialized in PCSX2 settings.",
+                    ex);
+            }
         }
 
         return buffer;
