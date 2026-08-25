@@ -216,7 +216,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### BUG-002 — PINE IPC read timeout too aggressive for initial metadata requests
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #36
 - **Recorded:** 2026-08-24 16:30
 - **Implemented:** `—`
 - **Problem:** The 5-second read timeout (`ReadTimeoutMs = 5000`) triggers on initial metadata requests (Version, Title, Id) after game load because PINE IPC takes longer than 5s to initialize and respond. Users see "Connected to PCSX2 but no PINE response received..." even with correct game loaded and IPC enabled — it's a false positive timeout, not an actual connection failure.
