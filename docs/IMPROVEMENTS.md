@@ -297,3 +297,15 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** Audited all 10 public documents against the five core policies; no content deviations found. Removed the two italic placeholder scaffolding lines from CHANGELOG.md (under Changed/Fixed) now that real entries exist.
 - **Changes:** CHANGELOG.md lost its placeholder guidance lines; all 10 public documents otherwise already comply (LF/no BOM, no hardwrap, International English, no placeholders/PII). The tracker records the audit outcome.
+
+### BUG-004 — Wrong-game state cannot recover without restarting the app
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-26 18:09
+- **Implemented:** `—`
+- **Problem:** When the app is running and the launched game's serial does not match the expected `SLUS-20251`, the app shows the Wrong game state. In `MainForm.RefreshOnce()` the wrong-game branch (`src/HmSth.App/MainForm.cs:277-281`) returns without disposing `_pine` or clearing the cached metadata, so the connection and cached serial stay frozen. The 400 ms refresh loop keeps running but never re-reads the serial, so launching the correct game is never detected — the only way to recover is to close and reopen the app.
+- **Possible Fix:** Make the Wrong game state self-healing: in the wrong-game branch, dispose `_pine` and clear the metadata cache (mirroring the `PineConnectionException`/`IOException` handlers at `src/HmSth.App/MainForm.cs:292-305`) so the next cycle reconnects and re-reads the serial; when the correct game is running the app transitions to Playing automatically. No new UI control is required and PINE stays strictly sequential. (Auto-recover, option B, confirmed by user.)
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
