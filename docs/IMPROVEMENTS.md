@@ -261,3 +261,39 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** Hardcoded ground-truth EE addresses in `GameMemoryReader` (GOLD `0x20267864`, STAMINA `0x20267830`, TIME `0x2085A2F4`), resolved via the CE→EE translation (`EEmem` base `0x7FF740000000`). The existing `StaminaReading`/`TimeReading` byte decode was already correct (MSB-first: `max_fatigue`/`season` = MSB … `stamina`/`minute` = LSB) and was kept unchanged. Removed the guessed `WeatherAddress`/`DecodeWeather`; `ReadWeather` returns `"Unknown"`.
 - **Changes:** Gameplay reads now return correct in-game GOLD, STAMINA, and TIME via PINE IPC (no RPM). Previously read derived/guessed EE addresses (correct decode, wrong locations) and returned garbage; the corrected addresses match the user's Cheat Engine layout. Weather stays `"Unknown"` pending the ENH-009 CE hunt.
+
+### ENH-015 — Near-real-time HUD value updates
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-26 16:27
+- **Implemented:** `—`
+- **Problem:** The WinForms companion refreshes gameplay values only every 1500 ms (`src/HmSth.App/MainForm.cs:55`, `_timer.Interval = 1500`), so the Game HUD, Memory Monitor, and Guide feel stale. Lowering the interval is blocked by a hidden cost: all 7 PINE reads per tick (3 metadata: version/serial/title; 4 gameplay: gold/stamina/time/weather) run synchronously on the UI thread, so an over-short interval freezes the UI during each cycle. PINE's strictly-sequential, ~7-in-flight constraint also forbids parallelizing reads within a cycle.
+- **Possible Fix:** Reduce the refresh interval to a safe near-real-time floor (e.g. 250–500 ms) and move the read loop off the UI thread (async/`Task`/`BackgroundWorker`) with UI-bound painting, or cache the 3 static metadata reads and re-read them only periodically. Keep PINE requests strictly sequential; respect the ~7-in-flight ceiling.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### ENH-016 — Rework companion UI/UX to desktop best practices
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-26 16:27
+- **Implemented:** `—`
+- **Problem:** The `src/HmSth.App` WinForms UI (dark `Theme`, hand-built `TableLayoutPanel` across Game HUD / Memory Monitor / Guide / status strip, built during ENH-014) was produced without a formal best-practice pass. Accessibility, layout consistency, and HUD readability over busy backgrounds are not verified against Windows/Fluent design guidance or WCAG 2.2.
+- **Possible Fix:** Audit the current UI against researched best practices (Fluent/Windows design guidelines, WCAG 2.2 contrast, keyboard navigation, text scaling, design-system/component consistency, HUD readability over noisy backgrounds). Apply targeted fixes (accessibility contrast/scale, layout hygiene, theming tokens) rather than a full reskin. Scope (full reskin vs targeted compliance) to be confirmed during verification.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
+
+### DOC-003 — Audit public documents for core-policy compliance
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-08-26 16:27
+- **Implemented:** `—`
+- **Problem:** Public-facing documents (README, CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, ARCHITECTURE, STRUCTURE, `docs/IMPROVEMENTS.md`, `docs/MEMORY_MAP.md`, `docs/UI_DESIGN_SPEC.md`) may not uniformly meet the five core policies (International English, no hardwrap except LICENSE/standard-formatted docs, LF line endings, atomic-commit discipline). Inconsistent docs risk a poor first public impression.
+- **Possible Fix:** Run an audit pass over all public docs against the five core policies; fix deviations (language, hardwrap, line endings, formatting). Exclude release/tagging work — that is handled by a separate workflow.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
