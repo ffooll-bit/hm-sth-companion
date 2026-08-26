@@ -33,3 +33,7 @@ temp/
 # AI tooling
 .cortexkit/
 .playwright-mcp/
+
+# AI / session artifacts (Magic Context generated, not deliverables)
+ARCHITECTURE.md
+STRUCTURE.md
