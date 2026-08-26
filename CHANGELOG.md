@@ -4,6 +4,14 @@
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [0.1.0] - 2026-08-26
+
+### Added
+
 - Initial repository structure.
 - Ignore local AI tooling directories. (#10)
 - Add PCSX2 PINE IPC proof of concept console app. (#9)
@@ -31,3 +39,4 @@
 - Fix companion app getting stuck in Wrong game state: it now auto-recovers without a restart when the correct game (SLUS-20251) is launched. (#53)
 
 [Unreleased]: https://github.com/ffooll-bit/hm-sth-companion/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ffooll-bit/hm-sth-companion/compare/424f2e8...v0.1.0
