@@ -277,6 +277,9 @@ internal sealed class MainForm : Form
         if (!string.Equals(_cachedSerial, ExpectedSerial, StringComparison.OrdinalIgnoreCase))
         {
             UpdateUiWrongGame();
+            _pine?.Dispose();
+            _pine = null;
+            _cachedVersion = _cachedSerial = _cachedTitle = null;
             return;
         }
 
