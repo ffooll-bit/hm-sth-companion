@@ -14,10 +14,16 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
-      - name: Build solution
-        run: dotnet build
+      - name: Build cross-platform projects
+        # The WinForms app (net8.0-windows) only builds on Windows, so the Linux
+        # job builds the cross-platform projects explicitly. `dotnet build` accepts
+        # only one project argument, so each is built separately. The full solution
+        # is validated by the build-windows job below.
+        run: |
+          dotnet build src/HmSth.Poc/HmSth.Poc.csproj
+          dotnet build tests/HmSth.Poc.Tests/HmSth.Poc.Tests.csproj
       - name: Run tests
-        run: dotnet test --no-build
+        run: dotnet test --no-build tests/HmSth.Poc.Tests/HmSth.Poc.Tests.csproj
       - name: Check line endings
         run: |
           if grep -rlP '\r$' --include="*.md" .; then
@@ -30,3 +36,13 @@ jobs:
             echo "::error::UTF-8 BOM found in markdown files"
             exit 1
           fi
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build solution (includes WinForms app)
+        run: dotnet build

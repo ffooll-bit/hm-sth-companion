@@ -227,16 +227,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `src/HmSth.Poc/PineClient.cs`, `tests/HmSth.Poc.Tests/FakePineServer.cs`, `tests/HmSth.Poc.Tests/PineClientTests.cs`
 
 ### ENH-014 — Build the WinForms companion application
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #39
 - **Recorded:** 2026-08-25 14:30
-- **Implemented:** `—`
+- **Implemented:** 2026-08-26 15:29
 - **Problem:** The POC console app proves the data path (PINE IPC → GameMemoryReader), but there is no shell application that renders the HUD specified in `docs/UI_DESIGN_SPEC.md`.
 - **Possible Fix:** Create `src/HmSth.App` (net8.0 WinForms) referencing `PineClient` and `GameMemoryReader` via project reference; implement the three application states (Disconnected / Wrong game / Playing), the two-column layout (Game HUD + Memory Monitor, full-width Guide), and the custom dark theme palette copied from the social preview.
 - **Actual Fix:** Create `src/HmSth.App` (net8.0 WinForms), `ProjectReference` to `HmSth.Poc`, render 3 states (Disconnected / Wrong game / Playing) + 2-column HUD/Memory Monitor layout + custom dark theme from `docs/UI_DESIGN_SPEC.md`; add to `HmSth.sln`.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Added `src/HmSth.App` (net8.0-windows WinExe with `UseWindowsForms` and a `ProjectReference` to `HmSth.Poc`) containing `Program.cs` (WinForms entry), `Theme.cs` (dark palette tokens from `docs/UI_DESIGN_SPEC.md`), and `MainForm.cs` (two-column HUD + Memory Monitor, full-width Guide, connection strip, DWM immersive dark title bar, and a 1.5s sequential refresh timer). Added the project to `HmSth.sln`. Updated `.github/workflows/ci.yml` so the Linux `build` job builds only the cross-platform projects while a new `build-windows` job builds the full solution (validating the WinForms app compiles).
+- **Changes:** A Windows companion app now renders the live Game HUD (Stamina bar, Money, Weather), a Memory Monitor of known EE addresses (Gold/Stamina/Time; FPS shows `--`), a Guide placeholder (save profile pending), and a connection strip with version/serial/state. It connects to PCSX2 PINE IPC and shows the three states (Disconnected / Wrong game / Playing). Weather, FPS, and Guide remain placeholders pending the ENH-009–011 CE hunts.
 
 ### DOC-002 — Two Magic Context documents untracked need a track/ignore decision
 - **Status:** `implemented`
