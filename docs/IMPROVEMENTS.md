@@ -239,16 +239,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `—`
 
 ### DOC-002 — Two Magic Context documents untracked need a track/ignore decision
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #40
 - **Recorded:** 2026-08-25 14:30
-- **Implemented:** `—`
+- **Implemented:** 2026-08-26 15:02
 - **Problem:** `ARCHITECTURE.md` and `STRUCTURE.md` were created by Magic Context and remain untracked. A decision is needed: commit them to the repository (and maintain them) or ignore them via `.gitignore`.
 - **Possible Fix:** Add both to `.gitignore` (they are session artifacts, not project deliverables) to keep `git status` clean. Alternative: track them and align with repo conventions.
 - **Actual Fix:** Add `ARCHITECTURE.md` and `STRUCTURE.md` to `.gitignore` under an "AI/session artifacts" section (mirrors ENH-004's `.cortexkit/` entry) — they are session-generated, not project deliverables.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Added `ARCHITECTURE.md` and `STRUCTURE.md` to `.gitignore` under an "AI / session artifacts" section, mirroring ENH-004's `.cortexkit/` entry. They remain on disk locally for reference but are no longer tracked or flagged by `git status`.
+- **Changes:** `git status` is now clean — the two Magic Context-generated documents are ignored. They are still present locally but excluded from the repository.
 
 ### BUG-003 — Gameplay memory reads (GOLD/TIME/STAMINA) return incorrect values
 - **Status:** `implemented`

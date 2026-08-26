@@ -14,6 +14,7 @@
 - Document verified EE memory map anchor for TIME and candidate addresses. (#20)
 - Add gameplay memory reading layer (Gold, Stamina, Time) via PINE IPC. (#18)
 - Correct gameplay memory read addresses (GOLD/STAMINA/TIME) via verified CE→EE translation. (#41)
+- Ignore Magic Context session documents (`ARCHITECTURE.md`, `STRUCTURE.md`). (#40)
 
 ### Changed
 
