@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using HmSth.Poc;
 
@@ -16,11 +18,16 @@ internal sealed class MainForm : Form
     private const string GoldAddr = "0x20267864";
     private const string StaminaAddr = "0x20267830";
     private const string TimeAddr = "0x2085A2F4";
+    private const int RefreshIntervalMs = 400;
 
     private const int DwmUseImmersiveDarkMode = 20;
 
-    private readonly System.Windows.Forms.Timer _timer = new();
+    private CancellationTokenSource? _cts;
+    private Task? _refreshLoop;
     private PineClient? _pine;
+    private string? _cachedVersion;
+    private string? _cachedSerial;
+    private string? _cachedTitle;
 
     private Panel _hud = null!;
     private Panel _monitor = null!;
@@ -52,9 +59,15 @@ internal sealed class MainForm : Form
         Font = Theme.Regular;
         BuildLayout();
         SetState(AppState.Disconnected, "Enable PINE IPC in PCSX2, then start a game");
-        _timer.Interval = 1500;
-        _timer.Tick += OnTick;
-        _timer.Start();
+        _cts = new CancellationTokenSource();
+        _refreshLoop = Task.Run(() => RefreshLoopAsync(_cts.Token));
+        FormClosing += MainForm_FormClosing;
+    }
+
+    private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
+    {
+        _cts?.Cancel();
+        _pine?.Dispose();
     }
 
     protected override void OnHandleCreated(EventArgs e)
@@ -205,7 +218,31 @@ internal sealed class MainForm : Form
         }
     }
 
-    private void OnTick(object? sender, EventArgs e)
+    private async Task RefreshLoopAsync(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                RefreshOnce();
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+
+            try
+            {
+                await Task.Delay(RefreshIntervalMs, ct);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
+    }
+
+    private void RefreshOnce()
     {
         if (_pine is null)
         {
@@ -213,43 +250,88 @@ internal sealed class MainForm : Form
             {
                 _pine = new PineClient(Host, Port);
                 _pine.Connect();
+                _cachedVersion = _pine.ReadString(PineCommand.Version);
+                _cachedSerial = _pine.ReadString(PineCommand.Id);
+                _cachedTitle = _pine.ReadString(PineCommand.Title);
             }
-            catch
+            catch (Exception)
             {
                 _pine?.Dispose();
                 _pine = null;
-                SetState(AppState.Disconnected, "Enable PINE IPC in PCSX2, then start a game");
+                _cachedVersion = _cachedSerial = _cachedTitle = null;
+                UpdateUiDisconnected("Enable PINE IPC in PCSX2, then start a game");
                 return;
             }
         }
 
+        if (!string.Equals(_cachedSerial, ExpectedSerial, StringComparison.OrdinalIgnoreCase))
+        {
+            UpdateUiWrongGame();
+            return;
+        }
+
         try
         {
-            string version = _pine.ReadString(PineCommand.Version);
-            string serial = _pine.ReadString(PineCommand.Id);
-            string title = _pine.ReadString(PineCommand.Title);
-
-            _stripVersion.Text = version;
-            _stripSerial.Text = serial;
-
-            if (!string.Equals(serial, ExpectedSerial, StringComparison.OrdinalIgnoreCase))
-            {
-                SetState(AppState.WrongGame, "Wrong game");
-                _moneyValue.Text = "Money    — G";
-                _staminaLabel.Text = "Stamina  — / —";
-                _weatherValue.Text = "Weather  —";
-                _monGold.Text = $"{GoldAddr}  —";
-                _monStamina.Text = $"{StaminaAddr}  —";
-                _monTime.Text = $"{TimeAddr}  —";
-                return;
-            }
-
-            var reader = new GameMemoryReader(_pine);
+            var reader = new GameMemoryReader(_pine!);
             GoldReading gold = reader.ReadGold();
             StaminaReading stamina = reader.ReadStamina();
             TimeReading time = reader.ReadTime();
             WeatherReading weather = reader.ReadWeather();
+            UpdateUiPlaying(gold, stamina, time, weather, _cachedTitle!, _cachedVersion!, _cachedSerial!);
+        }
+        catch (PineConnectionException)
+        {
+            _pine?.Dispose();
+            _pine = null;
+            _cachedVersion = _cachedSerial = _cachedTitle = null;
+            UpdateUiDisconnected("PINE no response — is the game in-game?");
+        }
+        catch (IOException)
+        {
+            _pine?.Dispose();
+            _pine = null;
+            _cachedVersion = _cachedSerial = _cachedTitle = null;
+            UpdateUiDisconnected("Connection lost");
+        }
+    }
 
+    private void UpdateUiDisconnected(string hint)
+    {
+        RunOnUi(() =>
+        {
+            SetState(AppState.Disconnected, hint);
+            _moneyValue.Text = "Money    — G";
+            _staminaLabel.Text = "Stamina  — / —";
+            _weatherValue.Text = "Weather  —";
+            _monGold.Text = $"{GoldAddr}  —";
+            _monStamina.Text = $"{StaminaAddr}  —";
+            _monTime.Text = $"{TimeAddr}  —";
+            _monFps.Text = "FPS       —";
+            _guideText.Text = "Year ? — Ending ?  (save profile pending, ENH-011)";
+        });
+    }
+
+    private void UpdateUiWrongGame()
+    {
+        RunOnUi(() =>
+        {
+            SetState(AppState.WrongGame, "Wrong game");
+            _moneyValue.Text = "Money    — G";
+            _staminaLabel.Text = "Stamina  — / —";
+            _weatherValue.Text = "Weather  —";
+            _monGold.Text = $"{GoldAddr}  —";
+            _monStamina.Text = $"{StaminaAddr}  —";
+            _monTime.Text = $"{TimeAddr}  —";
+            _guideText.Text = $"{_cachedTitle} — Year ? / Ending ?  (save profile pending)";
+            _stripVersion.Text = _cachedVersion!;
+            _stripSerial.Text = _cachedSerial!;
+        });
+    }
+
+    private void UpdateUiPlaying(GoldReading gold, StaminaReading stamina, TimeReading time, WeatherReading weather, string title, string version, string serial)
+    {
+        RunOnUi(() =>
+        {
             _moneyValue.Text = $"Money    {gold}";
             _staminaLabel.Text = $"Stamina  {stamina.Stamina}/{stamina.MaxStamina}";
             _staminaFill.Width = stamina.MaxStamina == 0
@@ -263,19 +345,15 @@ internal sealed class MainForm : Form
             _monFps.Text = "FPS       —";
 
             _guideText.Text = $"{title} — Year ? / Ending ?  (save profile pending)";
+            _stripVersion.Text = version;
+            _stripSerial.Text = serial;
             SetState(AppState.Playing, "Playing");
-        }
-        catch (PineConnectionException)
-        {
-            _pine.Dispose();
-            _pine = null;
-            SetState(AppState.Disconnected, "PINE no response — is the game in-game?");
-        }
-        catch (IOException)
-        {
-            _pine.Dispose();
-            _pine = null;
-            SetState(AppState.Disconnected, "Connection lost");
-        }
+        });
+    }
+
+    private void RunOnUi(Action action)
+    {
+        if (IsDisposed || !IsHandleCreated) return;
+        if (InvokeRequired) BeginInvoke(action); else action();
     }
 }
