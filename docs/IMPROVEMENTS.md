@@ -287,13 +287,13 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** The companion window now honors OS text-size and display-scaling (readable, non-clipped UI on high-DPI / large-text setups) and is announced by screen readers per panel; the window enforces a minimum size. No visual restyle; contrast and colour usage were already compliant.
 
 ### DOC-003 — Audit public documents for core-policy compliance
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #48
 - **Recorded:** 2026-08-26 16:27
-- **Implemented:** `—`
+- **Implemented:** 2026-08-26 17:52
 - **Problem:** Public-facing documents (README, CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, ARCHITECTURE, STRUCTURE, `docs/IMPROVEMENTS.md`, `docs/MEMORY_MAP.md`, `docs/UI_DESIGN_SPEC.md`) may not uniformly meet the five core policies (International English, no hardwrap except LICENSE/standard-formatted docs, LF line endings, atomic-commit discipline). Inconsistent docs risk a poor first public impression.
 - **Possible Fix:** Run an audit pass over all public docs against the five core policies; fix deviations (language, hardwrap, line endings, formatting). Exclude release/tagging work — that is handled by a separate workflow.
 - **Actual Fix:** Verified: a public-doc audit against the five core policies is outstanding. CRLF/BOM scan of all 10 public docs found no BOM and no CRLF — line-ending compliance is already clean. Remaining audit scope: International English usage, hardwrap (prose line length), and formatting/placeholder hygiene. Fix: run the audit, correct deviations; exclude release/tagging (handled by a separate workflow).
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** Audited all 10 public documents against the five core policies; no content deviations found. Removed the two italic placeholder scaffolding lines from CHANGELOG.md (under Changed/Fixed) now that real entries exist.
+- **Changes:** CHANGELOG.md lost its placeholder guidance lines; all 10 public documents otherwise already comply (LF/no BOM, no hardwrap, International English, no placeholders/PII). The tracker records the audit outcome.
