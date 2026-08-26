@@ -53,11 +53,21 @@ internal sealed class MainForm : Form
     {
         Text = "HM · STH Companion";
         ClientSize = new Size(660, 440);
+        MinimumSize = new Size(420, 300);
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Theme.Bg;
         ForeColor = Theme.Text;
         Font = Theme.Regular;
+        AutoScaleMode = AutoScaleMode.Font;
+        AccessibleName = "HM · STH Companion";
         BuildLayout();
+        _hud.AccessibleName = "Game HUD";
+        _hud.AccessibleRole = AccessibleRole.Pane;
+        _monitor.AccessibleName = "Memory Monitor";
+        _monitor.AccessibleRole = AccessibleRole.Pane;
+        _guide.AccessibleName = "Guide";
+        _guide.AccessibleRole = AccessibleRole.Pane;
+        _strip.AccessibleName = "Connection status";
         SetState(AppState.Disconnected, "Enable PINE IPC in PCSX2, then start a game");
         _cts = new CancellationTokenSource();
         _refreshLoop = Task.Run(() => RefreshLoopAsync(_cts.Token));

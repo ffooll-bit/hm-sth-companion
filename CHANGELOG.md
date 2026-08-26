@@ -22,6 +22,7 @@
 - _Behaviour changes, including any migration notes._
 - Remove `[PINE DEBUG]` logging left in `PineClient` from the BUG-002 investigation.
 - Make the companion HUD refresh near-real-time: move PINE reads off the UI thread (background loop) with cached emulator metadata; refresh ~400 ms, UI stays responsive. (#46)
+- Make the companion window honor OS text/DPI scaling and expose accessible names for its panels; add a minimum window size. (#47)
 
 ### Fixed
 
