@@ -263,16 +263,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** Gameplay reads now return correct in-game GOLD, STAMINA, and TIME via PINE IPC (no RPM). Previously read derived/guessed EE addresses (correct decode, wrong locations) and returned garbage; the corrected addresses match the user's Cheat Engine layout. Weather stays `"Unknown"` pending the ENH-009 CE hunt.
 
 ### ENH-015 — Near-real-time HUD value updates
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #46
 - **Recorded:** 2026-08-26 16:27
-- **Implemented:** `—`
+- **Implemented:** 2026-08-26 17:12
 - **Problem:** The WinForms companion refreshes gameplay values only every 1500 ms (`src/HmSth.App/MainForm.cs:55`, `_timer.Interval = 1500`), so the Game HUD, Memory Monitor, and Guide feel stale. Lowering the interval is blocked by a hidden cost: all 7 PINE reads per tick (3 metadata: version/serial/title; 4 gameplay: gold/stamina/time/weather) run synchronously on the UI thread, so an over-short interval freezes the UI during each cycle. PINE's strictly-sequential, ~7-in-flight constraint also forbids parallelizing reads within a cycle.
 - **Possible Fix:** Reduce the refresh interval to a safe near-real-time floor (e.g. 250–500 ms) and move the read loop off the UI thread (async/`Task`/`BackgroundWorker`) with UI-bound painting, or cache the 3 static metadata reads and re-read them only periodically. Keep PINE requests strictly sequential; respect the ~7-in-flight ceiling.
 - **Actual Fix:** Verified: `_timer.Interval = 1500` ms (MainForm.cs:55) and `OnTick` (MainForm.cs:208) runs on the UI thread (Microsoft docs: System.Windows.Forms.Timer.Tick fires on the UI thread), performing 7 synchronous PINE reads (3 metadata + 4 gameplay) directly in the handler — blocking network I/O on the UI thread. Lower interval alone freezes the UI. Fix: run the read loop on a background thread (System.Threading.Timer / Task / BackgroundWorker) and marshal UI updates back via Control.Invoke/BeginInvoke; cache the 3 static metadata reads (version/serial/title) re-reading only on (re)connect; keep PINE requests strictly sequential to respect the ~7-in-flight ceiling. Target interval 250–500 ms.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** `src/HmSth.App/MainForm.cs` now runs the 7 PINE reads on a background `Task` loop (`RefreshLoopAsync` at ~400 ms) instead of the UI-thread `System.Windows.Forms.Timer`; the 3 static metadata reads (version/serial/title) are cached per connection and re-read only on (re)connect; UI updates are marshaled back via `Control.BeginInvoke` (`RunOnUi`). The window no longer freezes during reads and refreshes ~3.75x more often.
+- **Changes:** The HUD, Memory Monitor, and Guide refresh about every 400 ms (was 1500 ms) and stay responsive while PINE reads run on a background thread; emulator version/serial/title are read once per connection instead of every tick. Wrong-game and disconnected handling are unchanged in behaviour.
 
 ### ENH-016 — Rework companion UI/UX to desktop best practices
 - **Status:** `verified`
