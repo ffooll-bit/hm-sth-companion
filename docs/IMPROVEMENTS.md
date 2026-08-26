@@ -275,16 +275,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** The HUD, Memory Monitor, and Guide refresh about every 400 ms (was 1500 ms) and stay responsive while PINE reads run on a background thread; emulator version/serial/title are read once per connection instead of every tick. Wrong-game and disconnected handling are unchanged in behaviour.
 
 ### ENH-016 — Rework companion UI/UX to desktop best practices
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #47
 - **Recorded:** 2026-08-26 16:27
-- **Implemented:** `—`
+- **Implemented:** 2026-08-26 17:36
 - **Problem:** The `src/HmSth.App` WinForms UI (dark `Theme`, hand-built `TableLayoutPanel` across Game HUD / Memory Monitor / Guide / status strip, built during ENH-014) was produced without a formal best-practice pass. Accessibility, layout consistency, and HUD readability over busy backgrounds are not verified against Windows/Fluent design guidance or WCAG 2.2.
 - **Possible Fix:** Audit the current UI against researched best practices (Fluent/Windows design guidelines, WCAG 2.2 contrast, keyboard navigation, text scaling, design-system/component consistency, HUD readability over noisy backgrounds). Apply targeted fixes (accessibility contrast/scale, layout hygiene, theming tokens) rather than a full reskin. Scope (full reskin vs targeted compliance) to be confirmed during verification.
 - **Actual Fix:** Verified: the src/HmSth.App UI (Theme.cs dark palette + MainForm.cs TableLayoutPanel) was built during ENH-014 without a formal accessibility/layout audit. Primary text contrast is high, but fonts are fixed 10 pt (no scaling) and there is no explicit keyboard/AT or WCAG pass. Fix: audit against Fluent/Windows guidelines + WCAG 2.2 (contrast 4.5:1 text / 3:1 UI, text scaling, never color-alone, focus order) and apply targeted fixes (scalable fonts, contrast edge checks, layout hygiene, theming tokens) — not a full reskin.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** `src/HmSth.App/MainForm.cs` sets `AutoScaleMode = AutoScaleMode.Font` so the window scales with OS text-size/DPI settings; adds `AccessibleName` to the form and the Game HUD / Memory Monitor / Guide panels and the connection strip, with `AccessibleRole.Pane` on the three panels; adds `MinimumSize = 420×300` so the window cannot be shrunk to clip content. The dark palette already met WCAG AA contrast (verified ≥ 4.5:1) and the state indicator pairs color with a text label, so no contrast/color-only changes were needed.
+- **Changes:** The companion window now honors OS text-size and display-scaling (readable, non-clipped UI on high-DPI / large-text setups) and is announced by screen readers per panel; the window enforces a minimum size. No visual restyle; contrast and colour usage were already compliant.
 
 ### DOC-003 — Audit public documents for core-policy compliance
 - **Status:** `verified`
