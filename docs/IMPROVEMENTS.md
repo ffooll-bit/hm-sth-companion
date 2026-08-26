@@ -264,7 +264,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-015 — Near-real-time HUD value updates
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #46
 - **Recorded:** 2026-08-26 16:27
 - **Implemented:** `—`
 - **Problem:** The WinForms companion refreshes gameplay values only every 1500 ms (`src/HmSth.App/MainForm.cs:55`, `_timer.Interval = 1500`), so the Game HUD, Memory Monitor, and Guide feel stale. Lowering the interval is blocked by a hidden cost: all 7 PINE reads per tick (3 metadata: version/serial/title; 4 gameplay: gold/stamina/time/weather) run synchronously on the UI thread, so an over-short interval freezes the UI during each cycle. PINE's strictly-sequential, ~7-in-flight constraint also forbids parallelizing reads within a cycle.
@@ -276,7 +276,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-016 — Rework companion UI/UX to desktop best practices
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #47
 - **Recorded:** 2026-08-26 16:27
 - **Implemented:** `—`
 - **Problem:** The `src/HmSth.App` WinForms UI (dark `Theme`, hand-built `TableLayoutPanel` across Game HUD / Memory Monitor / Guide / status strip, built during ENH-014) was produced without a formal best-practice pass. Accessibility, layout consistency, and HUD readability over busy backgrounds are not verified against Windows/Fluent design guidance or WCAG 2.2.
@@ -288,7 +288,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### DOC-003 — Audit public documents for core-policy compliance
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #48
 - **Recorded:** 2026-08-26 16:27
 - **Implemented:** `—`
 - **Problem:** Public-facing documents (README, CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, ARCHITECTURE, STRUCTURE, `docs/IMPROVEMENTS.md`, `docs/MEMORY_MAP.md`, `docs/UI_DESIGN_SPEC.md`) may not uniformly meet the five core policies (International English, no hardwrap except LICENSE/standard-formatted docs, LF line endings, atomic-commit discipline). Inconsistent docs risk a poor first public impression.
