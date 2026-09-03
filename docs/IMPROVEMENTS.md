@@ -311,13 +311,13 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** The app no longer requires a restart to switch games: from the Wrong game state it auto-recovers within about one refresh cycle once the correct game is launched.
 
 ### DOC-004 — Document the Cheat Engine pointer-to-EE address conversion procedure
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-09-03 22:30
 - **Implemented:** `—`
 - **Problem:** Deriving the EE RAM addresses that the PINE IPC application can read from Cheat Engine pointer offsets (`"pcsx2-qt.exe"+<base>` + offset) is currently done ad-hoc inside conversations. The conversion is repeatable and validated (each new EE address equals a fixed base-pointer value plus the CE offset, with the base value derived from already-validated EE addresses such as Time/Gold/Stamina), but no repository document records the procedure, so each future address requires re-deriving the method from scratch.
 - **Possible Fix:** Create (or update) a repository document that explains the CE pointer-to-EE conversion procedure step by step: where the CE offsets come from, how the shared base-pointer value is derived from already-validated EE addresses, how each new EE address is computed, and how the resulting value is decoded for PINE IPC reads so future addresses follow a repeatable path.
-- **Actual Fix:** `—`
+- **Actual Fix:** Verified: no repo document records the repeatable CE pointer-to-EE conversion procedure. `docs/MEMORY_MAP.md` lists a target-by-target "Derived Candidates" table (anchor + delta) and `src/HmSth.Poc/GameMemoryReader.cs:69` carries the formula as a one-line comment, but not a cohesive step-by-step method. Online verification confirms CE↔EE conversion is a standard, documented technique (EE base `0x20000000`; dedicated community converter tools), so a written procedure is the right fix. Fix: document the procedure comprehensively in `docs/MEMORY_MAP.md`: (1) the CE base pointer (`pcsx2-qt.exe + 0x0317C238`) and its offsets; (2) how the shared base-pointer value is derived from already-validated EE addresses (`base = EE - offset`, validated as `0x20267000` via Time/Gold/Stamina); (3) the conversion formula `EE = base + offset`; (4) the two EE regions that both resolve from the same base (short offsets near `0x2026783x` and large offsets near `0x2085A2xx`); (5) the value format/bit layout decoded per address for PINE IPC reads.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
