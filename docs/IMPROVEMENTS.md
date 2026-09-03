@@ -309,3 +309,15 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Rejection Reason:** `—`
 - **Actual Implemented:** In `MainForm.RefreshOnce()` the wrong-game branch now disposes `_pine` and clears the cached metadata (`_cachedVersion`/`_cachedSerial`/`_cachedTitle`) after `UpdateUiWrongGame()`, so the next 400 ms refresh cycle reconnects and re-reads the serial; when the correct game (`SLUS-20251`) is running the app transitions to Playing automatically. No new UI control; PINE stays strictly sequential.
 - **Changes:** The app no longer requires a restart to switch games: from the Wrong game state it auto-recovers within about one refresh cycle once the correct game is launched.
+
+### DOC-004 — Document the Cheat Engine pointer-to-EE address conversion procedure
+- **Status:** `recorded`
+- **Issue:** `—`
+- **Recorded:** 2026-09-03 22:30
+- **Implemented:** `—`
+- **Problem:** Deriving the EE RAM addresses that the PINE IPC application can read from Cheat Engine pointer offsets (`"pcsx2-qt.exe"+<base>` + offset) is currently done ad-hoc inside conversations. The conversion is repeatable and validated (each new EE address equals a fixed base-pointer value plus the CE offset, with the base value derived from already-validated EE addresses such as Time/Gold/Stamina), but no repository document records the procedure, so each future address requires re-deriving the method from scratch.
+- **Possible Fix:** Create (or update) a repository document that explains the CE pointer-to-EE conversion procedure step by step: where the CE offsets come from, how the shared base-pointer value is derived from already-validated EE addresses, how each new EE address is computed, and how the resulting value is decoded for PINE IPC reads so future addresses follow a repeatable path.
+- **Actual Fix:** `—`
+- **Rejection Reason:** `—`
+- **Actual Implemented:** `—`
+- **Changes:** `—`
