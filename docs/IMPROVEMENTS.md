@@ -312,7 +312,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### DOC-004 — Document the Cheat Engine pointer-to-EE address conversion procedure
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #57
 - **Recorded:** 2026-09-03 22:30
 - **Implemented:** `—`
 - **Problem:** Deriving the EE RAM addresses that the PINE IPC application can read from Cheat Engine pointer offsets (`"pcsx2-qt.exe"+<base>` + offset) is currently done ad-hoc inside conversations. The conversion is repeatable and validated (each new EE address equals a fixed base-pointer value plus the CE offset, with the base value derived from already-validated EE addresses such as Time/Gold/Stamina), but no repository document records the procedure, so each future address requires re-deriving the method from scratch.
