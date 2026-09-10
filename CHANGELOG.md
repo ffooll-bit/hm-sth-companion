@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Document the CE pointer-to-EE address conversion procedure with all known addresses and value formats in the memory map. (#57)
+
 ### Fixed
 
 ## [0.1.0] - 2026-08-26
