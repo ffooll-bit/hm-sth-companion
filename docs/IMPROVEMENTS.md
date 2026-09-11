@@ -324,7 +324,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### BUG-005 — MainForm crashes on invalid TIME bytes when the game is not fully in-game
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #62
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** When the game is in a transitional state (loading, title screen, game over) the TIME bytes read from EE memory can hold invalid values - Season ≥ 4 or Day = 0. `MainForm.ShopStatusText` indexes `SeasonStartWeekday[time.Season]` (valid only 0-3) and `WeekdayNames[today]` (valid only 0-6), so a garbage TIME value throws `System.IndexOutOfRangeException`. Because `RunOnUi` marshals via `BeginInvoke`, the exception surfaces on the UI thread (`InvokeMarshaledCallbacks`) and escapes the refresh-loop try/catch, crashing the app with a JIT debug dialog instead of showing a safe value.
@@ -336,7 +336,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-017 — Weather calendar tendency for the current day
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #63
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** The HUD shows today's weather and tomorrow's forecast from two packed bytes, but the in-game calendar colors each day with a season tendency that biases the forecast: yellow = mild (tends cloudy), blue = wet (tends rain), red = dry (tends clear/hot). The player cannot see today's tendency in the HUD, only the already-computed forecast.
@@ -348,7 +348,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-018 — Shop hour-level open/close schedule
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #65
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** ENH-009 shows only closed weekdays ("Closed today: ..."); the player cannot see whether a shop is currently open nor when it opens and closes. The current layout is too small to fit per-shop hourly schedules.
@@ -360,7 +360,7 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 
 ### ENH-019 — Rework the main app layout to show more information, more modern
 - **Status:** `verified`
-- **Issue:** `—`
+- **Issue:** #64
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** The current `HmSth.App` layout (two-panel grid, 660x440, minimal styling) is too small to fit the richer information the game supports - shop hour-level schedules (ENH-018), weather calendar tendency (ENH-017), and more - and looks dated.
