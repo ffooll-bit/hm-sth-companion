@@ -82,6 +82,41 @@ public readonly struct WeatherReading
     };
 }
 
+public readonly struct ToolReading
+{
+    public byte Id { get; }
+
+    public ToolReading(uint packed) => Id = (byte)(packed & 0xFF);
+
+    public string Name => Id switch
+    {
+        0xFF => "Empty",
+        0x51 => "Sickle",
+        0x3A => "Chicken Feed",
+        0x53 => "Hoe",
+        0x54 => "Watering Can",
+        0x55 => "Fishing Rod",
+        0x5A => "Flute",
+        _ => $"(0x{Id:X2})",
+    };
+
+    public override string ToString() => Name;
+}
+
+public readonly struct ItemReading
+{
+    public byte Id { get; }
+
+    public ItemReading(uint packed) => Id = (byte)(packed & 0xFF);
+
+    // ponytail: ID mapping incomplete (ENH-010); show hex until a full look-up table exists.
+    public override string ToString() => Id switch
+    {
+        0xFF => "Empty",
+        _ => $"0x{Id:X2}",
+    };
+}
+
 public sealed class GameMemoryReader
 {
     private readonly PineClient _pine;
@@ -94,6 +129,8 @@ public sealed class GameMemoryReader
     private const uint StaminaAddress = 0x20267830;
     private const uint GoldAddress = 0x20267864;
     private const uint WeatherAddress = 0x20267834; // CE offset +834, format 0000XXYY (forecast|today)
+    private const uint ActiveToolAddress = 0x20267844; // CE offset +844, format 000000ZZ
+    private const uint ActiveItemAddress = 0x20267840; // CE offset +840, format 000000ZZ
 
     public GameMemoryReader(PineClient pine) => _pine = pine;
 
@@ -104,4 +141,8 @@ public sealed class GameMemoryReader
     public TimeReading ReadTime() => new(_pine.ReadU32(TimeAddress));
 
     public WeatherReading ReadWeather() => new(_pine.ReadU32(WeatherAddress));
+
+    public ToolReading ReadTool() => new(_pine.ReadU32(ActiveToolAddress));
+
+    public ItemReading ReadItem() => new(_pine.ReadU32(ActiveItemAddress));
 }
