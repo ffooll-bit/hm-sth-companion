@@ -57,9 +57,29 @@ public readonly struct TimeReading
 
 public readonly struct WeatherReading
 {
-    public string Description { get; }
-    public WeatherReading(string description) => Description = description;
-    public override string ToString() => Description;
+    public byte Today { get; }
+    public byte Forecast { get; }
+
+    public WeatherReading(uint packed)
+    {
+        Today = (byte)(packed & 0xFF);
+        Forecast = (byte)((packed >> 8) & 0xFF);
+    }
+
+    public string TodayName => Name(Today);
+    public string ForecastName => Name(Forecast);
+
+    public override string ToString() => $"Today: {TodayName} | Forecast: {ForecastName}";
+
+    private static string Name(byte value) => value switch
+    {
+        0 => "Clear",
+        1 => "Light rain",
+        2 => "Heavy rain",
+        3 => "Storm",
+        4 => "Cloudy",
+        _ => $"({value})",
+    };
 }
 
 public sealed class GameMemoryReader
@@ -73,7 +93,7 @@ public sealed class GameMemoryReader
     private const uint TimeAddress = 0x2085A2F4;
     private const uint StaminaAddress = 0x20267830;
     private const uint GoldAddress = 0x20267864;
-    // Weather address not yet located (CE hunt pending, see ENH-009). ReadWeather returns Unknown.
+    private const uint WeatherAddress = 0x20267834; // CE offset +834, format 0000XXYY (forecast|today)
 
     public GameMemoryReader(PineClient pine) => _pine = pine;
 
@@ -83,5 +103,5 @@ public sealed class GameMemoryReader
 
     public TimeReading ReadTime() => new(_pine.ReadU32(TimeAddress));
 
-    public WeatherReading ReadWeather() => new("Unknown (address not yet located)");
+    public WeatherReading ReadWeather() => new(_pine.ReadU32(WeatherAddress));
 }

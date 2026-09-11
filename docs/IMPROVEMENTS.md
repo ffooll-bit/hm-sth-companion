@@ -143,16 +143,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** Added docs/MEMORY_MAP.md; docs/IMPROVEMENTS.md marks this item implemented; CHANGELOG.md gains a release note under [Unreleased].
 
 ### ENH-009 — Daily briefing: weather today and tomorrow, shop open days
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #21
 - **Recorded:** 2026-08-23 19:52
-- **Implemented:** `—`
+- **Implemented:** 2026-09-11 00:00
 - **Problem:** Players must boot the in-game TV forecast every morning to learn today's and tomorrow's weather, and shop closures still surprise them mid-trip; neither is available at a glance while playing.
 - **Possible Fix:** Monitor today's weather and tomorrow's forecast once a weather address is found (no public raw address exists; hunt via Cheat Engine starting from the ENH-008 anchor neighborhood). Shop open/holiday status is served from curated online data instead of memory reading, since schedules are static.
 - **Actual Fix:** Verified with a correction from live gameplay observation: the seasonal Dry/Mild/Wet calendar (Ushi No Tane `weather.php`) defines each day's probability distribution rather than a fixed outcome - actual weather is rolled randomly within those ranges, and the in-game TV forecast is only a prediction that can occasionally miss (percentage-based). Consequently tomorrow's weather cannot be computed reliably from the date alone; accurate display requires locating the weather values in memory via Cheat Engine - today's actual state and, if the game pre-rolls it, the next-day value. The static calendar stays useful as a fallback estimate and for presenting the odds alongside the monitored truth. Shop data confirmed complete: Ushi No Tane `townshops.php` lists all 8 shops with opening hours and closed weekdays, suitable as curated static content.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** `GameMemoryReader.ReadWeather()` now reads EE `0x20267834` via PINE and decodes the packed dword as today (low byte, `value & 0xFF`) and tomorrow's forecast (byte 1, `(value >> 8) & 0xFF`). `WeatherReading` carries `Today`/`Forecast` byte fields plus `TodayName`/`ForecastName` mapping to verified weather names (0=Clear, 1=Light rain, 2=Heavy rain, 3=Storm, 4=Cloudy; unknown IDs fall back to `(N)`). The HUD weather line shows both values as names. Shop open/closed status is computed from the in-game date: Spring 1 is always Monday; each season has 30 days and `30 % 7 = 2`, so season start weekdays are Spring=Mon, Summer=Wed, Fall=Fri, Winter=Sun. `WeekdayOf()` derives today's weekday from `SeasonStartWeekday[season] + day - 1`; the Guide panel lists all 8 shops (curated closures from Ushi No Tane `townshops.php`) and shows either `All shops open (Wed)` or `Closed today (Sun): Lyla's Flowers, Supermarket` for the current weekday.`
+- **Changes:** `src/HmSth.Poc/GameMemoryReader.cs` — `WeatherAddress` const (0x20267834), real `ReadWeather()` (was "Unknown (address not yet located)" fallback), `WeatherReading` struct decodes two bytes and maps them to verified weather names. `src/HmSth.App/MainForm.cs` — weather line shows today + forecast names from the reading; `ShopScheduleText()` renders the curated closure map in the Guide panel. `docs/MEMORY_MAP.md` — WEATHER row documents the verified byte→name mapping. `tests/.../GameMemoryReaderTests.cs` — replaced the fallback test with a decode + name test (today=2 → Heavy rain, forecast=3 → Storm, ToString check).`
 
 ### ENH-010 — Active item and tool slot monitor
 - **Status:** `verified`
