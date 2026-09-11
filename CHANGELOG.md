@@ -7,6 +7,7 @@
 ### Changed
 
 - Add a live weather briefing and shop schedule to the companion HUD: today's weather and tomorrow's forecast read from EE memory with verified names (Clear/Light rain/Heavy rain/Storm/Cloudy), plus a dynamic "closed today" line for all 8 town shops derived from the in-game weekday. (#21)
+- Add active tool and active item slot monitoring to the companion HUD: both equip slots read from EE memory, tools shown by name (Sickle, Hoe, Watering Can, Fishing Rod, Flute, Chicken Feed) and unidentified IDs as hex. (#22)
 - Document the CE pointer-to-EE address conversion procedure with all known addresses and value formats in the memory map. (#57)
 
 ### Fixed

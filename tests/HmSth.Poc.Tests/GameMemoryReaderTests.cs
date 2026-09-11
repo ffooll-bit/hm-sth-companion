@@ -95,4 +95,47 @@ public class GameMemoryReaderTests : IDisposable
         Assert.Equal("Today: Heavy rain | Forecast: Storm", weather.ToString());
     }
 
+    [Fact]
+    public void ReadTool_MapsKnownIdToName()
+    {
+        _server.ServeOne(_ => FakePineServer.Ok([0x51, 0x00, 0x00, 0x00])); // Sickle
+
+        ToolReading tool = _reader.ReadTool();
+
+        Assert.Equal(0x51, tool.Id);
+        Assert.Equal("Sickle", tool.ToString());
+    }
+
+    [Fact]
+    public void ReadTool_EmptyWhenSlotClear()
+    {
+        _server.ServeOne(_ => FakePineServer.Ok([0xFF, 0x00, 0x00, 0x00])); // Empty
+
+        Assert.Equal("Empty", _reader.ReadTool().ToString());
+    }
+
+    [Fact]
+    public void ReadTool_UnknownIdShowsHex()
+    {
+        _server.ServeOne(_ => FakePineServer.Ok([0x7B, 0x00, 0x00, 0x00])); // unmapped
+
+        Assert.Equal("(0x7B)", _reader.ReadTool().ToString());
+    }
+
+    [Fact]
+    public void ReadItem_EmptyWhenSlotClear()
+    {
+        _server.ServeOne(_ => FakePineServer.Ok([0xFF, 0x00, 0x00, 0x00])); // Empty
+
+        Assert.Equal("Empty", _reader.ReadItem().ToString());
+    }
+
+    [Fact]
+    public void ReadItem_UnknownIdShowsHex()
+    {
+        _server.ServeOne(_ => FakePineServer.Ok([0x2A, 0x00, 0x00, 0x00])); // unmapped
+
+        Assert.Equal("0x2A", _reader.ReadItem().ToString());
+    }
+
 }

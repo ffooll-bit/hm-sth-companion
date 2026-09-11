@@ -155,16 +155,16 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `src/HmSth.Poc/GameMemoryReader.cs` — `WeatherAddress` const (0x20267834), real `ReadWeather()` (was "Unknown (address not yet located)" fallback), `WeatherReading` struct decodes two bytes and maps them to verified weather names. `src/HmSth.App/MainForm.cs` — weather line shows today + forecast names from the reading; `ShopScheduleText()` renders the curated closure map in the Guide panel. `docs/MEMORY_MAP.md` — WEATHER row documents the verified byte→name mapping. `tests/.../GameMemoryReaderTests.cs` — replaced the fallback test with a decode + name test (today=2 → Heavy rain, forecast=3 → Storm, ToString check).`
 
 ### ENH-010 — Active item and tool slot monitor
-- **Status:** `verified`
+- **Status:** `implemented`
 - **Issue:** #22
 - **Recorded:** 2026-08-23 19:52
-- **Implemented:** `—`
+- **Implemented:** 2026-09-11 00:00
 - **Problem:** HM:StH keeps two equip slots (active item and active tool); the active tool is invisible during gameplay and only revealed after pausing, which breaks flow whenever the player must confirm what is equipped.
 - **Possible Fix:** Read both equip slots live and display item/tool identities in the HUD. Slot addresses unknown; hunt via Cheat Engine by switching equipment and diffing.
 - **Actual Fix:** Verified: no public raw address exists for the equip slots; the problem stands and the approach is unchanged - Cheat Engine diff-hunt by switching equipment. The randomizer's runtime clusters (for example `0x202729xx` in its table) provide starting neighborhoods for the scan.
 - **Rejection Reason:** `—`
-- **Actual Implemented:** `—`
-- **Changes:** `—`
+- **Actual Implemented:** EE Active Tool confirmed at `0x20267844` (CE offset `+844`) and Active Item at `0x20267840` (CE offset `+840`), both format `000000ZZ` (low byte = ID). `ToolReading` maps IDs to names (0xFF=Empty, 0x51=Sickle, 0x3A=Chicken Feed, 0x53=Hoe, 0x54=Watering Can, 0x55=Fishing Rod, 0x5A=Flute, unknown → `(N)`); `ItemReading` shows `Empty` for 0xFF and hex `0xNN` otherwise (item ID mapping incomplete). HUD shows `Tool` and `Item` lines, refreshed every ~400 ms; unknown tool/item IDs surface as hex so new IDs stay visible instead of guessing.
+- **Changes:** `src/HmSth.Poc/GameMemoryReader.cs` — `ActiveToolAddress` (0x20267844), `ActiveItemAddress` (0x20267840) consts, `ToolReading`/`ItemReading` structs, `ReadTool()`/`ReadItem()` methods. `src/HmSth.App/MainForm.cs` — `Tool`/`Item` HUD lines created in BuildLayout, updated in `UpdateUiPlaying`, reset to `—` in `UpdateUiDisconnected`/`UpdateUiWrongGame`. `tests/.../GameMemoryReaderTests.cs` — facts for tool name mapping and item hex fallback.
 
 ### ENH-011 — Save profile dashboard
 - **Status:** `verified`

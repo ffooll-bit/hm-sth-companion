@@ -37,6 +37,8 @@ internal sealed class MainForm : Form
     private Label _staminaLabel = null!;
     private Label _moneyValue = null!;
     private Label _weatherValue = null!;
+    private Label _toolValue = null!;
+    private Label _itemValue = null!;
     private Label _shopStatus = null!;
     private Label _shopMap = null!;
     private Label _monGold = null!;
@@ -115,6 +117,10 @@ internal sealed class MainForm : Form
         _staminaLabel = ValueLabel("Stamina  — / —");
         _moneyValue = ValueLabel("Money    — G");
         _weatherValue = ValueLabel("Weather  —");
+        _toolValue = ValueLabel("Tool     —");
+        _itemValue = ValueLabel("Item     —");
+        _hud.Controls.Add(_itemValue);
+        _hud.Controls.Add(_toolValue);
         _hud.Controls.Add(_weatherValue);
         _hud.Controls.Add(_moneyValue);
         _hud.Controls.Add(_staminaLabel);
@@ -296,7 +302,9 @@ internal sealed class MainForm : Form
             StaminaReading stamina = reader.ReadStamina();
             TimeReading time = reader.ReadTime();
             WeatherReading weather = reader.ReadWeather();
-            UpdateUiPlaying(gold, stamina, time, weather, _cachedTitle!, _cachedVersion!, _cachedSerial!);
+            ToolReading tool = reader.ReadTool();
+            ItemReading item = reader.ReadItem();
+            UpdateUiPlaying(gold, stamina, time, weather, tool, item, _cachedTitle!, _cachedVersion!, _cachedSerial!);
         }
         catch (PineConnectionException)
         {
@@ -322,6 +330,8 @@ internal sealed class MainForm : Form
             _moneyValue.Text = "Money    — G";
             _staminaLabel.Text = "Stamina  — / —";
             _weatherValue.Text = "Weather  —";
+            _toolValue.Text = "Tool     —";
+            _itemValue.Text = "Item     —";
             _monGold.Text = $"{GoldAddr}  —";
             _monStamina.Text = $"{StaminaAddr}  —";
             _monTime.Text = $"{TimeAddr}  —";
@@ -339,6 +349,8 @@ internal sealed class MainForm : Form
             _moneyValue.Text = "Money    — G";
             _staminaLabel.Text = "Stamina  — / —";
             _weatherValue.Text = "Weather  —";
+            _toolValue.Text = "Tool     —";
+            _itemValue.Text = "Item     —";
             _monGold.Text = $"{GoldAddr}  —";
             _monStamina.Text = $"{StaminaAddr}  —";
             _monTime.Text = $"{TimeAddr}  —";
@@ -349,7 +361,7 @@ internal sealed class MainForm : Form
         });
     }
 
-    private void UpdateUiPlaying(GoldReading gold, StaminaReading stamina, TimeReading time, WeatherReading weather, string title, string version, string serial)
+    private void UpdateUiPlaying(GoldReading gold, StaminaReading stamina, TimeReading time, WeatherReading weather, ToolReading tool, ItemReading item, string title, string version, string serial)
     {
         RunOnUi(() =>
         {
@@ -359,6 +371,8 @@ internal sealed class MainForm : Form
                 ? 0
                 : (int)(_staminaTrack.Width * (stamina.Stamina / (float)stamina.MaxStamina));
             _weatherValue.Text = $"Weather  {weather}";
+            _toolValue.Text = $"Tool     {tool}";
+            _itemValue.Text = $"Item     {item}";
 
             _monGold.Text = $"{GoldAddr}  {gold}";
             _monStamina.Text = $"{StaminaAddr}  {stamina.Stamina}/{stamina.MaxStamina}";
