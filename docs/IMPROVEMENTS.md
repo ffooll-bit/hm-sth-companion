@@ -323,49 +323,49 @@ Item IDs follow the format `<LABEL_CODE>-<NNN>` built from the default GitHub la
 - **Changes:** `docs/MEMORY_MAP.md` now contains a complete, repeatable CE-to-EE conversion procedure with all known addresses and their value formats; future CE offsets can be converted to PINE-readable EE addresses without ad-hoc derivation.
 
 ### BUG-005 — MainForm crashes on invalid TIME bytes when the game is not fully in-game
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** When the game is in a transitional state (loading, title screen, game over) the TIME bytes read from EE memory can hold invalid values - Season ≥ 4 or Day = 0. `MainForm.ShopStatusText` indexes `SeasonStartWeekday[time.Season]` (valid only 0-3) and `WeekdayNames[today]` (valid only 0-6), so a garbage TIME value throws `System.IndexOutOfRangeException`. Because `RunOnUi` marshals via `BeginInvoke`, the exception surfaces on the UI thread (`InvokeMarshaledCallbacks`) and escapes the refresh-loop try/catch, crashing the app with a JIT debug dialog instead of showing a safe value.
 - **Possible Fix:** Validate the decoded Season/Day before indexing in `ShopStatusText`/`WeekdayOf` (Season 0-3, Day 1-30), rendering a safe placeholder (e.g. "—") instead of letting the index throw; alternatives: clamp, or skip the shop line during the transition state.
-- **Actual Fix:** `—`
+- **Actual Fix:** Confirmed in code: `MainForm.WeekdayOf` (`src/HmSth.App/MainForm.cs:409`) computes `(time.Day - 1 + SeasonStartWeekday[time.Season]) % 7` where `SeasonStartWeekday` has indices 0-3 yet `time.Season` is a raw EE byte (can be ≥ 4), and `ShopStatusText` then indexes `WeekdayNames[today]` (`:419`) where Day = 0 makes `today = -1`. `TimeReading.SeasonName` already has a fallback (`GameMemoryReader.cs:46-53`), but the weekday path has none. Standard defensive-indexing guidance applies - no special API. Fix: guard `WeekdayOf` with a range check before indexing (Season 0-3, Day 1-30) and have `ShopStatusText` render a safe placeholder (`"Shops —"`) for out-of-range input instead of throwing; also keeps the shop line safe during transitional states.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-017 — Weather calendar tendency for the current day
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** The HUD shows today's weather and tomorrow's forecast from two packed bytes, but the in-game calendar colors each day with a season tendency that biases the forecast: yellow = mild (tends cloudy), blue = wet (tends rain), red = dry (tends clear/hot). The player cannot see today's tendency in the HUD, only the already-computed forecast.
 - **Possible Fix:** Display today's calendar tendency (name + color) alongside the weather briefing, derived from the fixed in-game schedule - the game spans exactly one year (4 seasons x 30 days), so the ranges are static: Spring 1-16 yellow, 17-21 blue, 22-30 red; Summer 1-4 red, 5-20 yellow, 21-26 blue, 27-30 red; Fall 1-19 yellow, 20-24 blue, 25-30 red; Winter 1-7 red, 8-16 yellow, 17-21 blue, 22-30 yellow. Curate the ranges as a static lookup (data verified against in-game calendar; reconstructable from Ushi No Tane weather.php).
-- **Actual Fix:** `—`
+- **Actual Fix:** Confirmed against the official-style source: the tendency ranges recorded in memory (#613) match Ushi No Tane `weather.php` exactly - Dry (≈ red), Mild (≈ yellow), Wet (≈ blue): Spring Dry 22-30 / Mild 1-16 / Wet 17-21; Summer Dry 1-4 and 27-30 / Mild 5-20 / Wet 21-26; Fall Dry 25-30 / Mild 1-19 / Wet 20-24; Winter Dry 1-7 / Mild 8-16 and 22-30 / Wet 17-21. Fix: add a static `TendencyRange(season, day)` lookup returning tendency name + color (red = dry/clear, yellow = mild/cloudy, blue = wet/rain), clamp day to the 1-30 range, and show today's tendency in the weather HUD line alongside the existing Today/Forecast readings; the tendency colors already map onto surface1/accent theme tokens.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-018 — Shop hour-level open/close schedule
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** ENH-009 shows only closed weekdays ("Closed today: ..."); the player cannot see whether a shop is currently open nor when it opens and closes. The current layout is too small to fit per-shop hourly schedules.
 - **Possible Fix:** Display per-shop hours (Carpenter's 10:00-18:00, Clove's Villa 08:00-18:00, Farmer's 08:00-17:00, Louis' 08:00-18:00, Lyla's 09:00-17:00, Supermarket 08:00-18:00, Sunny Garden Bar 18:00-00:00, Sunny Garden Cafe 12:00-17:00) plus a "currently open/closed" line computed from the in-game Time hour. Hours curated from Ushi No Tane townshops.php. Requires the main layout rework (ENH-019) to fit the richer display.
-- **Actual Fix:** `—`
+- **Actual Fix:** Confirmed in code: `MainForm.ShopStatusText` (`src/HmSth.App/MainForm.cs:397-407, 414-421`) lists only the 8 closed-weekday sets, no hours. Online source `townshops.php` gives exact hours for all 8 shops - Carpenter's 10:00-18:00, Clove's Villa 08:00-18:00, Farmer's 08:00-17:00, Louis' 08:00-18:00, Lyla's 09:00-17:00, Supermarket 08:00-18:00, Sunny Garden Bar 18:00-00:00, Sunny Garden Cafe 12:00-17:00 (plus closed days already curated). Fix: extend the static shop data with open/close hour pairs, compute "open now / closed" from `time.Hour` combined with the weekday closure map, render a compact hours + open-status line in the Guide/venue panel; Bar/Cafe cross midnight (18-00) so the open check must wrap the hour 0 as still-open; depends on the BUG-005 Day/Season guard feeding valid Time, and on ENH-019 making room in the layout.
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
 
 ### ENH-019 — Rework the main app layout to show more information, more modern
-- **Status:** `recorded`
+- **Status:** `verified`
 - **Issue:** `—`
 - **Recorded:** 2026-09-11 22:08
 - **Implemented:** `—`
 - **Problem:** The current `HmSth.App` layout (two-panel grid, 660x440, minimal styling) is too small to fit the richer information the game supports - shop hour-level schedules (ENH-018), weather calendar tendency (ENH-017), and more - and looks dated.
 - **Possible Fix:** Redesign the main window layout to display more information and a more modern look, drawing on the established theme and product lineage (GAIN-CODING visual baseline, deeper colors, stronger glow); a layout level-up that accommodates the pending richer content instead of pixel tweaks.
-- **Actual Fix:** `—`
+- **Actual Fix:** Confirmed: the current layout follows `docs/UI_DESIGN_SPEC.md` - a two-column grid (Game HUD + Memory Monitor) with the Guide strip spanning full width at the bottom; the GAME HUD panel is already dense (stamina bar, money, weather, tool, item, venue), so adding shop hours and weather tendency needs more space. The theme tokens and social preview (`docs/social-preview.html`) are the established visual reference, so the redesign must carry them forward (level-up, not reskin). Fix: redesign the main window layout to fit the richer content (shop hours, weather tendency, more readings), keep the dark theme and tokens from `UI_DESIGN_SPEC.md`/social preview as the baseline, and update `docs/UI_DESIGN_SPEC.md` plus `docs/social-preview.html` in the same change so the product identity and documentation stay consistent (docs-consistency rule).
 - **Rejection Reason:** `—`
 - **Actual Implemented:** `—`
 - **Changes:** `—`
