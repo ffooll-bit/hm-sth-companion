@@ -37,6 +37,8 @@ internal sealed class MainForm : Form
     private Label _staminaLabel = null!;
     private Label _moneyValue = null!;
     private Label _weatherValue = null!;
+    private Label _shopStatus = null!;
+    private Label _shopMap = null!;
     private Label _monGold = null!;
     private Label _monStamina = null!;
     private Label _monTime = null!;
@@ -139,6 +141,10 @@ internal sealed class MainForm : Form
             ForeColor = Theme.Accent,
         };
         _guideText = MutedLabel("Year ? — Ending ?  (save profile pending, ENH-011)");
+        _shopStatus = NewShopLine();
+        _shopMap = MutedLabel(ShopMapText());
+        _guide.Controls.Add(_shopMap);
+        _guide.Controls.Add(_shopStatus);
         _guide.Controls.Add(_guideText);
         _guide.Controls.Add(_guideBar);
 
@@ -321,6 +327,7 @@ internal sealed class MainForm : Form
             _monTime.Text = $"{TimeAddr}  —";
             _monFps.Text = "FPS       —";
             _guideText.Text = "Year ? — Ending ?  (save profile pending, ENH-011)";
+            _shopStatus.Text = "Shops —";
         });
     }
 
@@ -336,6 +343,7 @@ internal sealed class MainForm : Form
             _monStamina.Text = $"{StaminaAddr}  —";
             _monTime.Text = $"{TimeAddr}  —";
             _guideText.Text = $"{_cachedTitle} — Year ? / Ending ?  (save profile pending)";
+            _shopStatus.Text = "Shops —";
             _stripVersion.Text = _cachedVersion!;
             _stripSerial.Text = _cachedSerial!;
         });
@@ -350,7 +358,7 @@ internal sealed class MainForm : Form
             _staminaFill.Width = stamina.MaxStamina == 0
                 ? 0
                 : (int)(_staminaTrack.Width * (stamina.Stamina / (float)stamina.MaxStamina));
-            _weatherValue.Text = $"Weather  {weather.Description}";
+            _weatherValue.Text = $"Weather  {weather}";
 
             _monGold.Text = $"{GoldAddr}  {gold}";
             _monStamina.Text = $"{StaminaAddr}  {stamina.Stamina}/{stamina.MaxStamina}";
@@ -358,11 +366,55 @@ internal sealed class MainForm : Form
             _monFps.Text = "FPS       —";
 
             _guideText.Text = $"{title} — Year ? / Ending ?  (save profile pending)";
+            _shopStatus.Text = ShopStatusText(time);
             _stripVersion.Text = version;
             _stripSerial.Text = serial;
             SetState(AppState.Playing, "Playing");
         });
     }
+
+    private static readonly string[] WeekdayNames = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+
+    // Spring 1 is always Monday; every season has 30 days, and 30 % 7 = 2, so each season
+    // starts two weekdays later than the previous one: Summer 1 = Wed, Fall 1 = Fri, Winter 1 = Sun.
+    private static readonly int[] SeasonStartWeekday = { 0, 2, 4, 6 };
+
+    // Curated from Ushi No Tane townshops.php (8 shops, ENH-009). ClosedDays: 0=Mon..6=Sun.
+    private static readonly (string Name, int[] ClosedDays)[] Shops =
+    {
+        ("Sunny Bar", new[] { 0 }),
+        ("Sunny Cafe", new[] { 0 }),
+        ("Louis's", new[] { 2, 5 }),
+        ("Carpenter", new[] { 1, 3 }),
+        ("Clove's Villa", new[] { 1, 3 }),
+        ("Farmer's", new[] { 3 }),
+        ("Lyla's Flowers", new[] { 6 }),
+        ("Supermarket", new[] { 6 }),
+    };
+
+    private static int WeekdayOf(TimeReading time) => (time.Day - 1 + SeasonStartWeekday[time.Season]) % 7;
+
+    private static string ShopMapText() =>
+        "Closures: Mon–Bar/Cafe · Tue/Thu–Carpenter/Clove's · Wed/Sat–Louis's · Thu–Farmer's · Sun–Lyla's/Supermarket";
+
+    private static string ShopStatusText(TimeReading time)
+    {
+        int today = WeekdayOf(time);
+        string closed = string.Join(", ", Shops.Where(s => s.ClosedDays.Contains(today)).Select(s => s.Name));
+        return closed.Length == 0
+            ? $"All shops open ({WeekdayNames[today]})"
+            : $"Closed today ({WeekdayNames[today]}): {closed}";
+    }
+
+    private static Label NewShopLine() => new()
+    {
+        Dock = DockStyle.Top,
+        Text = "Shops —",
+        ForeColor = Theme.Accent,
+        Font = Theme.Mono,
+        Height = 20,
+        Padding = new Padding(0, 4, 0, 2),
+    };
 
     private void RunOnUi(Action action)
     {

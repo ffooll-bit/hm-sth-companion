@@ -78,14 +78,21 @@ public class GameMemoryReaderTests : IDisposable
     }
 
     [Fact]
-    public void ReadWeather_ReturnsUnknownWhenAddressFails()
+    public void ReadWeather_ParsesTodayAndForecast()
     {
-        // Simulate connection error by having server close without proper response
-        _server.ServeOne(null);
+        // Packed 0000XXYY: forecast=3, today=2
+        uint packed = (3u << 8) | 2u;
+        byte[] payload = new byte[4];
+        BinaryPrimitives.WriteUInt32LittleEndian(payload, packed);
+        _server.ServeOne(_ => FakePineServer.Ok(payload));
 
         WeatherReading weather = _reader.ReadWeather();
 
-        Assert.Equal("Unknown (address not yet located)", weather.Description);
+        Assert.Equal(2, weather.Today);
+        Assert.Equal(3, weather.Forecast);
+        Assert.Equal("Heavy rain", weather.TodayName);
+        Assert.Equal("Storm", weather.ForecastName);
+        Assert.Equal("Today: Heavy rain | Forecast: Storm", weather.ToString());
     }
 
 }

@@ -71,7 +71,7 @@ All addresses below are confirmed via the CE-to-EE conversion procedure (base `0
 | **TIME** | `0x2085A2F4` | `0x5F32F4` | `uint32` → `[season, day, hour, minute]` | Season: 0=Spring, 1=Summer, 2=Autumn, 3=Winter; day 1-based; hour 0–23; minute 0–59. Randomizer writes day at `0x2085A2F6`, season at `0x2085A2F7`. |
 | **STAMINA** | `0x20267830` | `0x830` | `uint32` → `[maxFatigue, fatigue, maxStamina, stamina]` | Each byte is 0–255. Max values shift with Power Berry count. Activity drains 2 stamina (4 in rain). Stamina 0 blocks activities. `IsMaxed` when fatigue == maxFatigue. |
 | **GOLD** | `0x20267864` | `0x864` | `uint32` → raw value | Gold = Stamina + 0x34 (EE offset delta matches CE offset delta `864 - 830 = 0x34`). |
-| **WEATHER** | `0x20267834` | `0x834` | `uint32` → `0000XXYY` | Today = `value & 0xFF`, Forecast = `(value >> 8) & 0xFF`. Weather is rolled randomly within seasonal probability ranges; TV forecast is a prediction that can miss. |
+| **WEATHER** | `0x20267834` | `0x834` | `uint32` → `0000XXYY` | Today = `value & 0xFF`, Forecast = `(value >> 8) & 0xFF`. Weather is rolled randomly within seasonal probability ranges; TV forecast is a prediction that can miss. Weather byte → name (verified): 0=Clear, 1=Light rain, 2=Heavy rain, 3=Storm, 4=Cloudy. |
 | **ACTIVE TOOL** | `0x20267844` | `0x844` | `uint32` → `000000ZZ` | Tool ID: `0xFF`=Empty, `0x51`=Sickle, `0x3A`=Chicken Feed, `0x53`=Hoe, `0x54`=Watering Can, `0x55`=Fishing Rod, `0x5A`=Flute. |
 | **ACTIVE ITEM** | `0x20267840` | `0x840` | `uint32` → `000000ZZ` | Item ID. Mapping incomplete; display hex ID until full lookup table is built. |
 | **FODDER** | `0x20267838` | `0x838` | `uint32` → `000000NN` | Barn fodder count (separate from inventory fodder). |
